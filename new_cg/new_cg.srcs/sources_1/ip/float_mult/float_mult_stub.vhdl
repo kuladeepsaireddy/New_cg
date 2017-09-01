@@ -1,10 +1,10 @@
 -- Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2015.4 (win64) Build 1412921 Wed Nov 18 09:43:45 MST 2015
--- Date        : Mon Jul 03 15:10:40 2017
+-- Date        : Thu Aug 31 20:31:20 2017
 -- Host        : Sai-PC running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode synth_stub
---               d:/mygit/new_CG/new_cg/new_cg.srcs/sources_1/ip/float_mult/float_mult_stub.vhdl
+--               D:/mygit/new_CG_bkup/new_cg/new_cg.srcs/sources_1/ip/float_mult/float_mult_stub.vhdl
 -- Design      : float_mult
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xc7z045ffg900-2
