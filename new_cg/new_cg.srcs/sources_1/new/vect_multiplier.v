@@ -1,8 +1,8 @@
-`define i 2
-`define nx 2
-`define ny 2
-`define N `nx*`ny
-
+//`define i 3
+//`define nx 2
+//`define ny 4
+//`define N `nx*`ny
+`include "../../../include_file.v"
 
 //`define numloop $clog2(`N)
 module vector_by_vector(
@@ -54,6 +54,9 @@ initial
   valid_2<=0;
  end
 
+ reg valid_m_1;
+reg valid_m_2;
+ 
 
 always@(posedge clk)
 begin
@@ -63,14 +66,19 @@ if(main_i_valid_1 & main_i_valid_2)
   begin 
   i_data_1[i]<=vect_A[i*32+:32];
   i_data_2[i]<=vect_B[i*32+:32];
-  valid_1<=1;
-  valid_2<=1;
+ 
   end
+  //valid_1<=1;
+  //valid_2<=1;
+  valid_m_1<=1;
+  valid_m_2<=1;
  end
  else 
    begin
-     valid_1<=0;
-     valid_2<=0;
+     //valid_1<=0;
+     //valid_2<=0;
+	 valid_m_1<=0;
+     valid_m_2<=0;
    end   
 end
 
@@ -83,8 +91,42 @@ always @(posedge clk)
 	//i_ready[3*`N -2]<=i_ready_result;
   end
   
-  
+reg valid_t_1;
+reg  valid_t_2;
+
+/*  
+always@(clk)
+ begin
+  valid_t_1 = valid_1;
+  valid_t_2 = valid_2;
+ end
+
+
+always@(posedge clk)
+ begin
+  if(valid_t_1)
+   begin
+     valid_m_1<=1;
+   end
+ else 
+   begin
+    valid_m_1<=0;
+   end   
+ end
  
+ 
+ always@(posedge clk)
+ begin
+  if(valid_t_2)
+   begin
+     valid_m_2<=1;
+   end
+ else 
+   begin
+    valid_m_2<=0;
+   end   
+ end
+*/ 
 /*
 
 always@(posedge clk)
@@ -160,10 +202,10 @@ for (x=0;x<numloop+1;x=x+1) begin:xs
    for (y=0; y<`N; y=y+1) begin:ys    
 		 	float_mult my_mult_instance(
              .aclk(clk),                                  // input wire aclk
-             .s_axis_a_tvalid(valid_1),            // input wire s_axis_a_tvalid
+             .s_axis_a_tvalid(valid_m_1),            // input wire s_axis_a_tvalid
              .s_axis_a_tready(o_ready_1[y]),            // output wire s_axis_a_tready
              .s_axis_a_tdata(i_data_1[y]),              // input wire [31 : 0] s_axis_a_tdata
-             .s_axis_b_tvalid(valid_2),            // input wire s_axis_b_tvalid
+             .s_axis_b_tvalid(valid_m_2),            // input wire s_axis_b_tvalid
              .s_axis_b_tready(o_ready_2[y]),            // output wire s_axis_b_tready
              .s_axis_b_tdata(i_data_2[y]),              // input wire [31 : 0] s_axis_b_tdata
              .m_axis_result_tvalid(o_valid[`N+y]),  // output wire m_axis_result_tvalid

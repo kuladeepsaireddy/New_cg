@@ -28,7 +28,7 @@
   <FileSets Version="1" Minor="31">
     <FileSet Name="sources_1" Type="DesignSrcs" RelSrcDir="$PSRCDIR/sources_1">
       <Filter Type="Srcs"/>
-      <File Path="$PSRCDIR/sources_1/new/cg_matrix_mult.v">
+      <File Path="$PSRCDIR/sources_1/new/vect_multiplier.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
@@ -37,7 +37,6 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/cg_scalar_division.v">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -45,15 +44,13 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/cg_op.v">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
-      <File Path="$PSRCDIR/sources_1/new/vect_multiplier.v">
+      <File Path="$PSRCDIR/sources_1/new/cg_matrix_mult.v">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -61,7 +58,6 @@
       </File>
       <File Path="$PSRCDIR/sources_1/new/cg_top_1.v">
         <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
           <Attr Name="UsedIn" Val="implementation"/>
           <Attr Name="UsedIn" Val="simulation"/>
@@ -72,7 +68,7 @@
       </File>
       <Config>
         <Option Name="DesignMode" Val="RTL"/>
-        <Option Name="TopModule" Val="cg_matrix_mult"/>
+        <Option Name="TopModule" Val="cg_top"/>
       </Config>
     </FileSet>
     <FileSet Name="constrs_1" Type="Constrs" RelSrcDir="$PSRCDIR/constrs_1">
@@ -208,45 +204,35 @@
     </Run>
     <Run Id="float_add_synth_1" Type="Ft3:Synth" SrcSet="float_add" Part="xc7z045ffg900-2" ConstrsSet="float_add" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/float_add_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="vect_float_sub_synth_1" Type="Ft3:Synth" SrcSet="vect_float_sub" Part="xc7z045ffg900-2" ConstrsSet="vect_float_sub" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/vect_float_sub_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="reciprocal_synth_1" Type="Ft3:Synth" SrcSet="reciprocal" Part="xc7z045ffg900-2" ConstrsSet="reciprocal" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/reciprocal_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="scalar_float_division_synth_1" Type="Ft3:Synth" SrcSet="scalar_float_division" Part="xc7z045ffg900-2" ConstrsSet="scalar_float_division" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/scalar_float_division_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
     </Run>
     <Run Id="float_mult_synth_1" Type="Ft3:Synth" SrcSet="float_mult" Part="xc7z045ffg900-2" ConstrsSet="float_mult" Description="Vivado Synthesis Defaults" Dir="$PRUNDIR/float_mult_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2015"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -268,9 +254,7 @@
     </Run>
     <Run Id="float_add_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="float_add" Description="Vivado Implementation Defaults" SynthRun="float_add_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015">
-          <Desc>Vivado Implementation Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -284,9 +268,7 @@
     </Run>
     <Run Id="vect_float_sub_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="vect_float_sub" Description="Vivado Implementation Defaults" SynthRun="vect_float_sub_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015">
-          <Desc>Vivado Implementation Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -300,9 +282,7 @@
     </Run>
     <Run Id="reciprocal_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="reciprocal" Description="Vivado Implementation Defaults" SynthRun="reciprocal_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015">
-          <Desc>Vivado Implementation Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -316,9 +296,7 @@
     </Run>
     <Run Id="scalar_float_division_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="scalar_float_division" Description="Vivado Implementation Defaults" SynthRun="scalar_float_division_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015">
-          <Desc>Vivado Implementation Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
@@ -332,9 +310,7 @@
     </Run>
     <Run Id="float_mult_impl_1" Type="Ft2:EntireDesign" Part="xc7z045ffg900-2" ConstrsSet="float_mult" Description="Vivado Implementation Defaults" SynthRun="float_mult_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015">
-          <Desc>Vivado Implementation Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2015"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>

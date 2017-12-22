@@ -1,11 +1,11 @@
-`timescale 1ns / 1ps
-`define nx 2
-`define ny 2
-`define N `nx*`ny
-`define n_size $clog2(`N)
-`define i_size $clog2(`nx)
-`define j_size $clog2(`ny)
-
+//`timescale 1ns / 1ps
+///`define nx 2
+//`define ny 4
+//`define N `nx*`ny
+////`define n_size $clog2(`N)
+//`define i_size $clog2(`nx)
+//`define j_size $clog2(`ny)
+`include "../../../include_file.v"
 module cg_matrix_mult(
 input wire clk,
 input wire [31:0] vect,
@@ -956,7 +956,7 @@ if(end_sig)
 else if(o_ready_2_mult)
  begin
   //i_valid_2_mult<=1'b1;
-  i_data_2_mult<=32'hc0800000;
+  i_data_2_mult<=32'h40800000;
  end/*
  else
   begin
@@ -1059,7 +1059,7 @@ blk_ram your_instance_name (
   .doutb(doutb)  // output wire [31 : 0] doutb
 );
 */
-
+/*
 float_add out_adder(
   .aclk(clk),                                  // input wire aclk
   .s_axis_a_tvalid(o_valid_result_add),            // input wire s_axis_a_tvalid
@@ -1072,7 +1072,22 @@ float_add out_adder(
   .m_axis_result_tready(i_ready),  // input wire m_axis_result_tready
   .m_axis_result_tdata(o_data)    // output wire [31 : 0] m_axis_result_tdata
 );
+*/
 
+
+vect_float_sub out_sub(
+      .aclk(clk),                                  // input wire aclk
+      .s_axis_a_tvalid(o_valid_result_mult),        // input wire s_axis_a_tvalid
+      .s_axis_a_tready(i_ready_result_mult),   // output wire s_axis_a_tready
+      .s_axis_a_tdata(o_data_result_mult),          // input wire [31 : 0] s_axis_a_tdata
+      .s_axis_b_tvalid(o_valid_result_add),       // input wire s_axis_b_tvalid
+      .s_axis_b_tready(i_ready_result_add),  // output wire s_axis_b_tready
+      .s_axis_b_tdata(o_data_result_add),         // input wire [31 : 0] s_axis_b_tdata
+      .m_axis_result_tvalid(o_valid),   // output wire m_axis_result_tvalid
+      .m_axis_result_tready(i_ready),   // input wire m_axis_result_tready
+      .m_axis_result_tdata(o_data)    // output wire [31 : 0] m_axis_result_tdata
+    
+);
 
 /*
 cg_vector_subtractor sub_instnce(

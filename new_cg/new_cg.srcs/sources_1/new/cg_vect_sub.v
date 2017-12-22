@@ -1,6 +1,7 @@
-`define nx 4
-`define ny 4
-`define N `nx*`ny
+//`define nx 2
+//`define ny 4
+//`define N `nx*`ny
+`include "../../../include_file.v"
 module cg_vector_subtractor(
 input wire clk,
 input wire [31:0] i_data_vect_1,

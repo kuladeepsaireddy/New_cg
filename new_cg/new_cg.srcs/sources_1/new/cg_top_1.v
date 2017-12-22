@@ -1,8 +1,4 @@
-`timescale 1ns / 1ps
-`define nx 2
-`define ny 2
-`define N `nx*`ny
-`define size $clog2(`N)
+`include "../../../include_file.v"
 //3f80000040000000
 //4040000040800000
 module cg_top(
@@ -12,6 +8,7 @@ input wire i_valid,
 output reg [31:0] sol,
 output reg  o_ready,
 output reg o_valid,
+output reg [`size-1:0]  iter_num,
 input wire [31:0] epsilon
  );
 //reg [31:0] r;
@@ -30,12 +27,10 @@ reg [`size-1:0] op_counter_2;
 reg [`size-1:0] op_counter_3;
 reg [`size-1:0] op_counter_4;
 reg [`size-1:0] op_counter_5;
-reg [`size-1:0] op_counter_6;
-reg [`size-1:0] op_counter_7;
 
 
 
-reg result_counter;
+
 reg final_reg;
 
  
@@ -170,7 +165,7 @@ wire o_ready_scalar_2;
 wire [31:0] o_data_2;
 wire o_valid_2;
 reg i_ready_2;
-
+/*
 reg [31:0] i_data_1_vect_3;
 reg [31:0]i_data_2_vect_3;
 reg[31:0] i_data_scalar_3;
@@ -183,7 +178,7 @@ wire o_ready_scalar_3;
 wire [31:0] o_data_3;
 wire o_valid_3;
 reg i_ready_3;
-
+*/
 
 reg [31:0] i_data_1_vect_4;
 reg [31:0]i_data_2_vect_4;
@@ -269,13 +264,14 @@ reg [`size:0] wr_addr_3;
 reg [`size:0] wr_addr_4;
 reg [`size:0] wr_addr_5;
 reg [`size:0] wr_addr_6;
-reg [`size:0] wr_addr_7;
+//reg [`size:0] wr_addr_7;
 reg [`size:0] wr_addr_8;
 reg [`size:0] wr_addr_9;
 reg [`size:0] wr_addr_r;
 reg [`size:0] wr_addr_x;
+reg [`size:0] wr_addr_ax;
 reg [`size:0] wr_addr_q;
-reg [`size:0] wr_addr_s;
+
 reg [`size:0] wr_addr_b;
 
 reg flag_1;
@@ -309,16 +305,12 @@ reg end_flag_3;
 reg end_flag_4;
 reg end_flag_5;
 reg end_flag_6;
-reg end_flag_7;
-reg end_flag_8;
-reg end_flag_9;
-reg end_flag_10;
 
 
 reg check_op_1;
 reg check_op_2;
 reg check_op_3;
-reg check_op_4;
+
 
 initial
 begin
@@ -329,13 +321,13 @@ begin
 	 wr_addr_4<=0;
 	 wr_addr_5<=0;
 	 wr_addr_6<=0;
-	 wr_addr_7<=0;
+	 //wr_addr_7<=0;
 	 wr_addr_8<=0;
 	 wr_addr_9<=0;
 	 wr_addr_r<=0;
 	 wr_addr_x<=0;
+	 wr_addr_ax<=0;
 	 wr_addr_q<=0;
-	 wr_addr_s<=0;
 	 wr_addr_b<=0;
 	 op_counter<=0;
 	 op_counter_1<=0;
@@ -343,8 +335,6 @@ begin
 	 op_counter_3<=0;
 	 op_counter_4<=0;
 	 op_counter_5<=0;
-	 op_counter_6<=0;
-	 op_counter_7<=0;
 	 flag_1<=0;
 	 flag_2<=0;
 	 flag_3<=0;
@@ -373,14 +363,10 @@ begin
 	 end_flag_4<=0;
 	 end_flag_5<=0;
 	 end_flag_6<=0;
-	 end_flag_7<=0;
-	 end_flag_8<=0;
-	 end_flag_9<=0;
-	 end_flag_10<=0;
 	 check_op_1<=0;
 	 check_op_2<=0;
 	 check_op_3<=0;
-	 check_op_4<=0;
+	 iter_num<=1;
 	 i_valid_1_vect_mult<=1'b0;
 	 i_valid_2_vect_mult<=1'b0;
 	 i_valid_1_div_1<=1'b0;
@@ -397,9 +383,9 @@ begin
      i_data_1_valid_2<=1'b0;
 	 i_data_2_valid_2<=1'b0;
 	 i_data_scalar_valid_2<=1'b0;
-     i_data_1_valid_3<=1'b0;
-	 i_data_2_valid_3<=1'b0;
-	 i_data_scalar_valid_3<=1'b0;
+     //i_data_1_valid_3<=1'b0;
+	// i_data_2_valid_3<=1'b0;
+	 //i_data_scalar_valid_3<=1'b0;
 	 i_data_1_valid_4<=1'b0;
 	 i_data_2_valid_4<=1'b0;
 	 i_data_scalar_valid_4<=1'b0;
@@ -419,13 +405,13 @@ end
 
 
 reg [31:0] mem_r [`N-1:0];
-reg [31:0] mem_u [`N-1:0];
+//reg [31:0] mem_u [`N-1:0];
 reg [31:0] mem_w [`N-1:0];
-reg [31:0] mem_m [`N-1:0];
+//reg [31:0] mem_m [`N-1:0];
 reg [31:0] mem_n [`N-1:0];
 reg [31:0] mem_z [`N-1:0];
 reg [31:0] mem_q [`N-1:0];
-reg [31:0] mem_s [`N-1:0];
+//reg [31:0] mem_s [`N-1:0];
 reg [31:0] mem_p [`N-1:0];
 reg [31:0] mem_x [`N-1:0];
 reg [31:0] mem_b [`N-1:0];
@@ -467,11 +453,11 @@ always@(posedge clk)
    begin
     wr_addr<=wr_addr+1;
    end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg)
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg)
    begin
     wr_addr<=0;
    end
- else if(!final_flag & count_check==`N-1)
+ else if(!final_flag & count_check==`N)
   begin 
    wr_addr<=0;
   end  
@@ -480,11 +466,11 @@ always@(posedge clk)
 always@(posedge clk)
  begin
  
- if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg)
+ if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg)
    begin
    wr_addr_6<=0;
    end
-  else if(!final_flag & count_check==`N-1)
+  else if(!final_flag & count_check==`N)
    begin
     wr_addr_6<=0;
    end
@@ -500,16 +486,16 @@ always@(posedge clk)
     begin
 	 wr_addr_r<=wr_addr_r+1;
 	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg)
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg)
    begin
      wr_addr_r<=0;
    end
-  else if(!final_flag & count_check==`N-1)
+  else if(!final_flag & count_check==`N)
    begin
       wr_addr_r<=0;
    end   
  end 
-
+/*
 always@(posedge clk)
  begin
   
@@ -530,16 +516,16 @@ always@(posedge clk)
 	 wr_addr_7<=wr_addr_7+1;
 	end    
  end 
- 
+ */
 
 
 always@(posedge clk)
  begin
-   if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+   if(wr_addr_5 == `N &  wr_addr_6 == `N & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_5<=0;
    end
-  else if(!final_flag & count_check==`N-1 )
+  else if(!final_flag & count_check==`N )
    begin
       wr_addr_5<=0;
    end 
@@ -562,11 +548,11 @@ always@(posedge clk)
     begin
 	 wr_addr_2<=wr_addr_2+1;
 	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_2<=0;
    end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N)
    begin
       wr_addr_2<=0;
    end     
@@ -576,15 +562,15 @@ always@(posedge clk)
  always@(posedge clk)
  begin
    
- if(o_valid_4 & !final_reg & count & end_flag_9 & check_op_4)
+ if(o_valid_4 & !final_reg & count & end_flag_5 & check_op_3)
   begin
     wr_addr_8<=wr_addr_8+1;
   end  
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_8<=0;
    end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N )
    begin
       wr_addr_8<=0;
    end
@@ -594,14 +580,14 @@ always@(posedge clk)
 	end    
  end  
  
- 
+ /*
  always@(posedge clk)
  begin
    if(o_valid_2 & !final_reg & count & !end_flag_4 & !check_op_2)
     begin
 	 wr_addr_s<=wr_addr_s+1;
 	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
    begin
       wr_addr_s<=0;
    end
@@ -610,20 +596,20 @@ always@(posedge clk)
       wr_addr_s<=0;
    end     
  end  
- 
+ */
  
  
   always@(posedge clk)
  begin
-   if(!final_reg & count & o_valid_3 & !end_flag_7 & !check_op_3 )
+   if(!final_reg & count & o_valid_2 & !end_flag_4 & !check_op_2 )
     begin
 	 wr_addr_q<=wr_addr_q+1;
 	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_q<=0;
    end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N )
    begin
       wr_addr_q<=0;
    end     
@@ -640,11 +626,11 @@ always@(posedge clk)
 	 wr_addr_4<=wr_addr_4+1;
 	end 
 	
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_4<=0;
    end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N )
    begin
       wr_addr_4<=0;
    end     
@@ -653,15 +639,15 @@ always@(posedge clk)
  
    always@(posedge clk)
  begin
-   if(!final_reg & count & o_valid_4 & !end_flag_10 & !check_op_4)
+   if(!final_reg & count & o_valid_4 & !end_flag_6 & !check_op_3)
     begin
 	 wr_addr_9<=wr_addr_9+1;
 	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_9<=0;
    end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N )
    begin
       wr_addr_9<=0;
    end     
@@ -675,15 +661,24 @@ always@(posedge clk)
     begin
 	 wr_addr_x<=wr_addr_x+1;
 	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
-   begin
-      wr_addr_x<=0;
-   end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N )
    begin
       wr_addr_x<=0;
    end     
  end  
+ 
+ 
+  always@(posedge clk)
+  begin
+    if(!final_reg & count & wr_addr_ax<`N & wr_addr_x==`N)
+	 begin
+	  wr_addr_ax<=wr_addr_ax+1;	  
+	 end
+  else if(!final_flag & count_check==`N )
+    begin
+      wr_addr_ax<=0;
+    end      
+  end
  
  
  
@@ -697,11 +692,11 @@ always@(posedge clk)
   begin
     wr_addr_3<=wr_addr_3+1;
   end  
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
    begin
       wr_addr_3<=0;
    end
-   else if(!final_flag & count_check==`N-1 )
+   else if(!final_flag & count_check==`N )
    begin
       wr_addr_3<=0;
    end     
@@ -713,8 +708,8 @@ always@(posedge clk)    /// b block
  begin
   if(i_valid)
    begin
-    mem_b[wr_addr_b]<=b;
-	 wr_addr_b<=wr_addr_b+1;
+    mem_b[wr_addr]<=b;
+	 //wr_addr_b<=wr_addr_b+1;
    end
 
  end 
@@ -748,6 +743,7 @@ always@(posedge clk)    /// r block
  end 
 
  
+/* 
 always@(posedge clk)    /// u block
  begin
    if(i_valid)
@@ -767,7 +763,7 @@ always@(posedge clk)    /// u block
     end		
  end 
  
- 
+ */
   
 always@(posedge clk)    /// p block
  begin
@@ -800,7 +796,7 @@ always@(posedge clk)    /// w block
 	  //addra_w<=wr_addr_8;
 	  //wr_addr_8<=wr_addr_8+1;
    end
-  else  if(o_valid_4 & !final_reg & count & end_flag_9 & check_op_4)
+  else  if(o_valid_4 & !final_reg & count & end_flag_5 & check_op_3)
   begin
      mem_w[wr_addr_8]<=o_data_4;
 	 // wea_w<=1'b1;     
@@ -812,7 +808,7 @@ always@(posedge clk)    /// w block
  
  
  
-  
+ /* 
 always@(posedge clk)    /// m block
  begin
    if(!final_reg & !count & o_valid_mat_mult & !flag_3)     //w=A*u
@@ -837,7 +833,8 @@ always@(posedge clk)    /// m block
   end  
  end 
  
- 
+ */
+ /*
  always@(posedge clk)    /// s block
  begin
    if(!final_reg & !count & o_valid_mat_mult & !flag_3)   //w=A*u
@@ -855,6 +852,7 @@ always@(posedge clk)    /// m block
    end 
   end
  
+ */
 always@(posedge clk)    /// q block
  begin
    if(!final_reg & !count & o_valid_mat_mult & !flag_3)   //w=A*u
@@ -863,9 +861,9 @@ always@(posedge clk)    /// q block
 	   //wea_q<=1'b1;
 	   //addra_q<=wr_addr_2;
 	end
-  else if(!final_reg & count & o_valid_3 & !end_flag_7 & !check_op_3 )
+  else if(!final_reg & count & o_valid_2 & !end_flag_4 & !check_op_2 )
    begin
-      mem_q[wr_addr_q]<=o_data_3;
+      mem_q[wr_addr_q]<=o_data_2;
 	   //wea_q<=1'b1;
 	   //addra_q<=wr_addr_q;
 	   //wr_addr_q<=wr_addr_q+1;
@@ -884,7 +882,7 @@ always@(posedge clk)    /// z block
 	 //addra_z<=wr_addr_4;
 	 //wr_addr_4<=wr_addr_4+1;
 	end
-  else if(!final_reg & count & o_valid_4 & !end_flag_10 & !check_op_4)
+  else if(!final_reg & count & o_valid_4 & !end_flag_6 & !check_op_3)
    begin
       mem_z[wr_addr_9]<=o_data_4;
 	 // wea_z<=1'b1;
@@ -937,19 +935,19 @@ always@(posedge clk)    /// x block
  end   
  
  
- 
+
  
  always@(posedge clk)                 ///  matrix multiplication block
   begin
-   if(i_valid)                             //w=A*u
+   if(i_valid)                             //w=A*b
     begin
 	 vect_mat_mult<=b;
 	 i_valid_mat_mult<=1'b1;
 	i_ready_mat_mult<=1'b1;
 	end
-   else if(!final_reg & !count & wr_addr_2==`N & wr_addr_3 <`N )                               //n=A*m
+   else if(!final_reg & !count & wr_addr_2==`N & wr_addr_3 <`N )                               //n=A*w
     begin
-      vect_mat_mult<=mem_m[wr_addr_3];
+      vect_mat_mult<=mem_w[wr_addr_3];
 		//addrb_m<=wr_addr_3;
 		i_valid_mat_mult<=1'b1;
 		i_ready_mat_mult<=1'b1; 
@@ -958,7 +956,7 @@ always@(posedge clk)    /// x block
     end
    else if (!final_reg & count & wr_addr_3 <`N )	  ////n= A*m
     begin
-	   vect_mat_mult<=mem_m[wr_addr_3];
+	   vect_mat_mult<=mem_w[wr_addr_3];
 		//addrb_m<=wr_addr_3;
 		i_valid_mat_mult<=1'b1;
 		i_ready_mat_mult<=1'b1; 
@@ -967,19 +965,19 @@ always@(posedge clk)    /// x block
 	
 	end
 	
-	else if(!final_reg & count & o_valid_1  & end_flag_1 & check_op_1)  //final check A*x
+	else if(!final_reg & count & wr_addr_ax<`N & wr_addr_x==`N & wr_addr_4==`N)  //final check A*x
 	 begin
-	     vect_mat_mult<=o_data_1;
+	     vect_mat_mult<=mem_x[wr_addr_ax];
 	     i_valid_mat_mult<=1'b1;
 		 i_ready_mat_mult<=1'b1; 
 		 check_flag<=1;
 	 end
-	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
       begin
          check_flag<=0;
 		 flag_3<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         check_flag<=0;
 		 flag_3<=0;
@@ -1038,7 +1036,7 @@ always@(posedge clk)            ////////for vector multiplication
         begin 
         vect_A_vect_mult[i*32+:32]<=mem_r[i];
 		//addrb_r_L<=0;
-		vect_B_vect_mult[i*32+:32]<=mem_u[i];
+		vect_B_vect_mult[i*32+:32]<=mem_r[i];
 	  end	
 		//addrb_u_L<=0;
 		i_valid_1_vect_mult<=1'b1;
@@ -1054,7 +1052,7 @@ always@(posedge clk)            ////////for vector multiplication
 	    begin
           vect_A_vect_mult[j*32+:32]<=mem_w[j];
  		//addrb_w_L<=0;
-    	  vect_B_vect_mult[j*32+:32]<=mem_u[j];
+    	  vect_B_vect_mult[j*32+:32]<=mem_r[j];
 		end  
 		//addrb_u_L<=0;
 		i_valid_1_vect_mult<=1'b1;
@@ -1071,7 +1069,7 @@ always@(posedge clk)            ////////for vector multiplication
 	   begin
     	   vect_A_vect_mult[k*32+:32]<=mem_r[k];
 		//addrb_r_L<=0;
-		   vect_B_vect_mult[k*32+:32]<=mem_u[k];
+		   vect_B_vect_mult[k*32+:32]<=mem_r[k];
 		end   
 		///addrb_u_L<=0;
 		i_valid_1_vect_mult<=1'b1;
@@ -1086,7 +1084,7 @@ always@(posedge clk)            ////////for vector multiplication
 	  begin
          vect_A_vect_mult[l*32+:32]<=mem_w[l];
 		//addrb_w_L<=0;
-		 vect_B_vect_mult[l*32+:32]<=mem_u[l];
+		 vect_B_vect_mult[l*32+:32]<=mem_r[l];
 	 end	
 		//addrb_u_L<=0;
 		i_valid_1_vect_mult<=1'b1;
@@ -1094,12 +1092,12 @@ always@(posedge clk)            ////////for vector multiplication
 		i_ready_result_vect_mult<=1'b1;
 		flag_2<=1'b1;
    end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
      begin
         flag_1<=0; 
 		flag_2<=0;
      end
-   else if(!final_flag & count_check==`N-1)	
+   else if(!final_flag & count_check==`N)	
      begin
      flag_1<=0;
 	 flag_2<=0;
@@ -1135,12 +1133,12 @@ always@(posedge clk)            ////////for vector multiplication
         gamma<=o_data_vect_mult;
 		flag_x<=1;
      end
-	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
       begin
          flag_4<=0;
 		 flag_x<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         flag_4<=0;
 		flag_x<=0;
@@ -1149,7 +1147,7 @@ always@(posedge clk)            ////////for vector multiplication
    
 always@(posedge clk)                                                    //asssingning delta= w*u for 1st iteration
  begin
-  if(!final_reg & !count & flag_2 & o_valid_result_vect_mult & !flag_5)
+  if(!final_reg & !count & flag_2 & o_valid_result_vect_mult & !flag_5 &flag_4 )
 	  begin
 	   delta<=o_data_vect_mult;
 	   flag_5<=1;
@@ -1159,11 +1157,11 @@ always@(posedge clk)                                                    //asssin
      delta<=o_data_vect_mult;
 	   flag_5<=1;
    end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
       begin
          flag_5<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         flag_5<=0;
       end	  
@@ -1194,12 +1192,12 @@ always@(posedge clk)       ///////// division block---1
 		 i_ready_result_div_1<=1'b1;
          flag_d<=1;		 
     end
- else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+ else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
       begin
          flag_d<=0;
 		 flag_d_1<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         flag_d<=0;
         flag_d_1<=0;		
@@ -1232,12 +1230,12 @@ always@(posedge clk)       ///////// division block---1
 		 flag_z<=1;
 
       end
-	 else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	 else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
       begin
          flag_y<=0;
 		 flag_z<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         flag_y<=0;
 	    flag_z<=0;		
@@ -1266,12 +1264,12 @@ always@(posedge clk)       ///////// division block---1
       alpha<=o_data_result_reci;
 	  flag_7<=1;
      end
-     else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+     else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
       begin
          flag_6<=0;
 		 flag_7<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         flag_6<=0;
 		flag_7<=0;
@@ -1286,11 +1284,11 @@ always@(posedge clk)       ///////// division block---1
 	   beta<=o_data_div_2;
 	   flag_b<=1'b1;
 	 end
-   	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+   	else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
       begin
         flag_b<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
         flag_b<=0;
       end	  
@@ -1318,12 +1316,12 @@ always@(posedge clk)       ///////// division block---1
 	   i_ready_result_reci<=1'b1;
 	   end
 	 
-	 else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	 else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
       begin
 		flag_s_1<=0;
 		flag_s_2<=0;
       end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
       begin
 		flag_s_1<=0;
 		flag_s_2<=0;
@@ -1337,24 +1335,6 @@ always@(posedge clk)       ///////// division block---1
   
   end
  
- always@(posedge clk)          /// subtract block ---2
-  begin
-    if(!final_reg & count & check_flag & o_valid_mat_mult )
-	 begin
-	   i_data_1_sub_2<=mem_b[check_reg]; 
-		i_data_2_sub_2<=o_data_mat_mult;
-		//addrb_b<=check_reg;
-		//check_reg<=check_reg+1;
-	   i_valid_1_sub_2<=1'b1;
-	   i_valid_2_sub_2<=1'b1;
-	   i_ready_sub_result_2<=1'b1;
-	 end
-	 else 
-	  begin
-	     i_valid_1_sub_2<=1'b0;
-	     i_valid_2_sub_2<=1'b0;
-	  end
-   end
 
 
  
@@ -1382,7 +1362,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
      
      else if(!final_reg & count &  o_ready_1_1 & o_ready_2_1& o_ready_scalar_1 & flag_b & !end_flag_1 )  //p
 	   begin
-	     i_data_1_vect_1<=mem_u[op_counter];
+	     i_data_1_vect_1<=mem_r[op_counter];
 	    i_data_2_vect_1<=mem_p[op_counter];
 	    //addrb_p<=op_counter;
 		//addrb_u<=op_counter;
@@ -1400,11 +1380,12 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	   
 	  else if(!final_reg & count &  o_ready_1_1 & o_ready_2_1& o_ready_scalar_1 & flag_7  &!end_flag_2 & wr_addr_5>=`N-1) //x
 	    begin
-		  i_data_1_vect_1<=mem_x[op_counter_4];
-	      i_data_2_vect_1<=mem_p[op_counter_4];
+		  i_data_1_vect_1<=mem_x[op_counter_3];
+	      i_data_2_vect_1<=mem_p[op_counter_3];
 	      //addrb_x<=op_counter_4;
 		  //addrb_u<=op_counter_4;
 	       i_data_scalar_1<=alpha;
+		   	   
 	      //op_counter_4<=op_counter_4+1;
 	      i_data_1_valid_1<=1'b1;
 	      i_data_2_valid_1<=1'b1;
@@ -1431,8 +1412,75 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
         end		
 	end
   
+  
+  
+ always@(posedge clk)    // cg-op 2 block  for  q and r
+ begin
+    if(!final_reg & !count & flag_6 &  wr_addr_2>=`N-1 & o_ready_1_2& o_ready_2_2& o_ready_scalar_2 & !end_flag_3)/////r
+	  begin
+	    i_data_1_vect_2<=mem_r[op_counter_1];
+	    i_data_2_vect_2<=mem_q[op_counter_1];
+	    //addrb_r<=op_counter_1;
+		//addrb_s<=op_counter_1;
+	    i_data_scalar_2[30:0]<=alpha[30:0];
+		i_data_scalar_2[31:31]<=!alpha[31:31];
+	    //op_counter_1<=op_counter_1+1;
+	    i_data_1_valid_2<=1'b1;
+	    i_data_2_valid_2<=1'b1;
+	    i_data_scalar_valid_2<=1'b1;
+	    i_ready_2<=1'b1;
+	    
+	
+	  end
+   
+   else if (!final_reg & count & flag_b & o_ready_1_2& o_ready_2_2 & o_ready_scalar_2 & !end_flag_3)  //q
+     begin
+        i_data_1_vect_2<=mem_w[op_counter_1];
+	    i_data_2_vect_2<=mem_q[op_counter_1];
+	    //addrb_m=op_counter_2;
+		//addrb_q<=op_counter_2;
+	    i_data_scalar_2<=beta;
+	   // op_counter_2<=op_counter_2+1;
+	    i_data_1_valid_2<=1'b1;
+	    i_data_2_valid_2<=1'b1;
+	    i_data_scalar_valid_2<=1'b1;
+	    i_ready_2<=1'b1;
+    end
+	
+	else if(!final_reg & count  &  wr_addr_q >=`N-1 & o_ready_1_2& o_ready_2_2& o_ready_scalar_2 & !end_flag_4 & flag_7)	   ////r
+	  begin
+	  i_data_1_vect_2<=mem_r[op_counter_4];
+	    i_data_2_vect_2<=mem_q[op_counter_4];
+		
+	    //addrb_r<=op_counter_5;
+		//addrb_s<=op_counter_5;
+	    i_data_scalar_2[30:0]<=alpha[30:0];
+		i_data_scalar_2[31:31]<=!alpha[31:31];
+	    //op_counter_5<=op_counter_5+1;
+	    i_data_1_valid_2<=1'b1;
+	    i_data_2_valid_2<=1'b1;
+	    i_data_scalar_valid_2<=1'b1;
+	    i_ready_2<=1'b1;
+	   
+	  end
+	  
+     else 
+        begin
+		  if(i_data_1_valid_2 &  o_ready_1_2)
+		   begin
+            i_data_1_valid_2<=1'b0;
+	        
+		  end
+         if(i_data_2_valid_2 & i_data_scalar_valid_2 & o_ready_2_2& o_ready_scalar_2 )
+           begin
+            i_data_2_valid_2<=1'b0;
+	        i_data_scalar_valid_2<=1'b0;
+           end 
+        end
 
- 
+end 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ /*
  always@(posedge clk)    // cg-op 2 block  for s and r 
   begin
     if(!final_reg & !count & flag_6 &  wr_addr_2>=`N-1 & o_ready_1_2& o_ready_2_2& o_ready_scalar_2 & !end_flag_3)/////r
@@ -1447,10 +1495,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	    i_data_2_valid_2<=1'b1;
 	    i_data_scalar_valid_2<=1'b1;
 	    i_ready_2<=1'b1;
-	    /* if(op_counter_1==`N)
-	    begin
-		  end_flag_3<=1;
-		end	*/
+	    
 	
 	  end
 	  
@@ -1466,10 +1511,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	    i_data_2_valid_2<=1'b1;
 	    i_data_scalar_valid_2<=1'b1;
 	    i_ready_2<=1'b1;
-       /*if(op_counter_1==`N)
-	    begin
-		  end_flag_3<=1;
-		end*/
+       
        end
 
      else if(!final_reg & count  &  wr_addr_s >=`N-1 & o_ready_1_2& o_ready_2_2& o_ready_scalar_2 & !end_flag_4 & flag_7)	   ////r
@@ -1485,10 +1527,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	    i_data_2_valid_2<=1'b1;
 	    i_data_scalar_valid_2<=1'b1;
 	    i_ready_2<=1'b1;
-	   /*if(op_counter_5 ==`N)
-	    begin
-		 end_flag_4<=1;
-		end*/
+	   
 	  end
 	  
 	  else 
@@ -1521,10 +1560,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	    i_data_2_valid_3<=1'b1;
 	    i_data_scalar_valid_3<=1'b1;
 	    i_ready_3<=1'b1;
-		/*if(op_counter_2 ==`N)
-	    begin
-		 end_flag_5<=1;
-		end*/
+		
       end
 	  
 	else if (!final_reg & count & flag_b & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3 & !end_flag_6)  //q
@@ -1539,10 +1575,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	    i_data_2_valid_3<=1'b1;
 	    i_data_scalar_valid_3<=1'b1;
 	    i_ready_3<=1'b1;
-		/*if(op_counter_2 ==`N)
-	    begin
-		 end_flag_6<=1;
-		end*/
+		
       
      end
    else if(!final_reg & count & flag_7 & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3 & wr_addr_q>=`N-1 & !end_flag_7)  //u
@@ -1557,10 +1590,7 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 	    i_data_2_valid_3<=1'b1;
 	    i_data_scalar_valid_3<=1'b1;
 	    i_ready_3<=1'b1;
-		/*if(op_counter_6 ==`N)
-	    begin
-		 end_flag_7<=1;
-		end*/
+		
 
     end	
 	
@@ -1579,16 +1609,17 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
         end	
 		
   end 
-
+*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  always@(posedge clk)    // cg-op 4 block  for z and w
   begin
-    if(!final_reg & !count & flag_6 & wr_addr_4 >=`N-1 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_8)///w
+    if(!final_reg & !count & flag_6 & wr_addr_4 >=`N-1 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_5)///w
       begin
-	    i_data_1_vect_4<=mem_w[op_counter_3];
-	    i_data_2_vect_4<=mem_z[op_counter_3];
+	    i_data_1_vect_4<=mem_w[op_counter_2];
+	    i_data_2_vect_4<=mem_z[op_counter_2];
 	    //addrb_w<=op_counter_3;
 		//addrb_z<=op_counter_3;
-	    i_data_scalar_4<=alpha;
+	    i_data_scalar_4[30:0]<=alpha[30:0];
+		i_data_scalar_4[31:31]<=!alpha[31:31];
 	   // op_counter_3<=op_counter_3+1;
 	    i_data_1_valid_4<=1'b1;
 	    i_data_2_valid_4<=1'b1;
@@ -1600,10 +1631,10 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 		end*/	  
 	end
    
-   else if(!final_reg & count & flag_b & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_9 & wr_addr_4 >=`N-1)    ///z
+   else if(!final_reg & count & flag_b & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_5 & wr_addr_4 >=`N-1)    ///z
      begin
-	   i_data_1_vect_4<=mem_n[op_counter_3];
-	    i_data_2_vect_4<=mem_z[op_counter_3];
+	   i_data_1_vect_4<=mem_n[op_counter_2];
+	    i_data_2_vect_4<=mem_z[op_counter_2];
 	    //addrb_n<=op_counter_3;
 		//addrb_z<=op_counter_3;
 	    i_data_scalar_4<=beta;
@@ -1617,13 +1648,14 @@ always@(posedge clk)    // cg-op 1 block  for  p and x
 		 end_flag_9<=1;
 		end*/
 	 end
-   else if(!final_reg & count & flag_7 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_10& wr_addr_9>=`N-1) //w
+   else if(!final_reg & count & flag_7 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_6& wr_addr_9>=`N-1) //w
      begin
-	   i_data_1_vect_4<=mem_w[op_counter_7];
-	    i_data_2_vect_4<=mem_z[op_counter_7];
+	   i_data_1_vect_4<=mem_w[op_counter_5];
+	    i_data_2_vect_4<=mem_z[op_counter_5];
 	    //addrb_w<=op_counter_7;
 		//addrb_z<=op_counter_7;
-	    i_data_scalar_4<=alpha;
+	    i_data_scalar_4[30:0]<=alpha[30:0];
+		i_data_scalar_4[31:31]<=!alpha[31:31];
 	    //op_counter_7<=op_counter_7+1;
 	    i_data_1_valid_4<=1'b1;
 	    i_data_2_valid_4<=1'b1;
@@ -1675,12 +1707,12 @@ always@(posedge clk)
 		 end_flag_1<=1;
 		end
 	  end
-	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
      begin
         op_counter<=0; 
 		end_flag_1<=0;
      end
-   else if(!final_flag & count_check==`N-1)	
+   else if(!final_flag & count_check==`N)	
      begin
      op_counter<=0;
 	 end_flag_1<=0;
@@ -1699,7 +1731,7 @@ always@(posedge clk)
 		 end_flag_3<=1;
 		end
 	  end
-   else if(!final_reg & count &  o_ready_1_2 & o_ready_2_2& o_ready_scalar_2 & flag_b & !end_flag_3 )  //p
+   else if(!final_reg & count & flag_b & o_ready_1_2& o_ready_2_2 & o_ready_scalar_2 & !end_flag_3)  
 	   begin
          op_counter_1<=op_counter_1+1;
 		 if(op_counter_1==`N-1)
@@ -1707,12 +1739,12 @@ always@(posedge clk)
 		   end_flag_3<=1;
 		  end
 	  end
-	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
      begin
         op_counter_1<=0; 
 		end_flag_3<=0;
      end
-   else if(!final_flag & count_check==`N-1)	
+   else if(!final_flag & count_check==`N)	
      begin
      op_counter_1<=0;
 	 end_flag_3<=0;
@@ -1720,7 +1752,7 @@ always@(posedge clk)
      end	 
  end 
  
- 
+/* 
 always@(posedge clk)
  begin
    if(!final_reg & !count & flag_6 & wr_addr_2 >=`N-1 & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3  & !end_flag_5 )
@@ -1753,36 +1785,36 @@ always@(posedge clk)
      end	 
  end 
  
- 
+ */
 always@(posedge clk)
  begin
-   if(!final_reg & !count & flag_6 & wr_addr_4 >=`N-1 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_8 )
+   if(!final_reg & !count & flag_6 & wr_addr_4 >=`N-1 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_5 )
 	  begin
-	    op_counter_3<=op_counter_3+1;
-		if(op_counter_3==`N-1)
+	    op_counter_2<=op_counter_2+1;
+		if(op_counter_2==`N-1)
 	      begin
-		   end_flag_8<=1;
+		   end_flag_5<=1;
 		  end
 	  end
-   else if(!final_reg & count & flag_b & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_9)  //p
+   else if(!final_reg & count & flag_b & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_5 & wr_addr_4 >=`N-1)  
 	   begin
-         op_counter_3<=op_counter_3+1;
-		 if(op_counter_3==`N-1)
+         op_counter_2<=op_counter_2+1;
+		 if(op_counter_2==`N-1)
 	      begin
-		   end_flag_9<=1;		 
+		   end_flag_5<=1;		 
 		  end
 	  end
-	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
      begin
-        op_counter_3<=0; 
-		end_flag_8<=0;
-        end_flag_9<=0;
+        op_counter_2<=0; 
+		end_flag_5<=0;
+        //end_flag_9<=0;
      end
-   else if(!final_flag & count_check==`N-1)	
+   else if(!final_flag & count_check==`N)	
      begin
-     op_counter_3<=0;
-     end_flag_8<=0;
-     end_flag_9<=0;
+     op_counter_2<=0;
+     end_flag_5<=0;
+     //end_flag_9<=0;
      end	 
  end 
  
@@ -1791,22 +1823,22 @@ always@(posedge clk)
  begin
   if(!final_reg & count &  o_ready_1_1 & o_ready_2_1& o_ready_scalar_1 & flag_7  &!end_flag_2 & wr_addr_5>=`N-1)
     begin
-	  op_counter_4<=op_counter_4+1;
+	  op_counter_3<=op_counter_3+1;
 	  check_op_1<=1;
-	  if(op_counter_4==`N-1)
+	  if(op_counter_3==`N-1)
 	      begin
 		   end_flag_2<=1;		 
 		  end
 	end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
      begin
-        op_counter_4<=0; 
+        op_counter_3<=0; 
 		end_flag_2<=0;
 		check_op_1<=0;
      end
-   else if(!final_flag & count_check==`N-1)	
+   else if(!final_flag & count_check==`N)	
      begin
-     op_counter_4<=0;
+     op_counter_3<=0;
      end_flag_2<=0;
 	 check_op_1<=0;
      end	 
@@ -1815,24 +1847,24 @@ always@(posedge clk)
  
 always@(posedge clk)
  begin
-  if(!final_reg & count  &  wr_addr_s >=`N-1 & o_ready_1_2& o_ready_2_2& o_ready_scalar_2 & !end_flag_4 & flag_7)
+  if(!final_reg & count  &  wr_addr_q >=`N-1 & o_ready_1_2& o_ready_2_2& o_ready_scalar_2 & !end_flag_4 & flag_7)
     begin
-	  op_counter_5<=op_counter_5+1;
+	  op_counter_4<=op_counter_4+1;
 	  check_op_2<=1;
-	  if(op_counter_5==`N-1)
+	  if(op_counter_4==`N-1)
 	      begin
 		   end_flag_4<=1;		 
 		  end
 	end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
      begin
-        op_counter_5<=0; 
+        op_counter_4<=0; 
 		end_flag_4<=0;
 		check_op_2<=0;
      end
-   else if(!final_flag & count_check==`N-1)	
+   else if(!final_flag & count_check==`N)	
      begin
-     op_counter_5<=0;
+     op_counter_4<=0;
 	 end_flag_4<=0;
 	 check_op_2<=0;
  
@@ -1841,6 +1873,32 @@ always@(posedge clk)
  end
  
  
+ always@(posedge clk)
+ begin
+  if(!final_reg & count & flag_7 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_6 & wr_addr_9>=`N-1)
+    begin
+	  op_counter_5<=op_counter_5+1;
+	  check_op_3<=1;
+	   if(op_counter_5==`N-1)
+	      begin
+		   end_flag_6<=1;		 
+		  end
+	end
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
+     begin
+        op_counter_5<=0; 
+		end_flag_6<=0;
+		check_op_3<=0;
+     end
+   else if(!final_flag & count_check==`N)	
+     begin
+     op_counter_5<=0;
+     end_flag_6<=0;
+	 check_op_3<=0;
+     end	 
+ 
+ end
+ /*
 always@(posedge clk)
  begin
   if(!final_reg & count & flag_7 & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3 & wr_addr_q>=`N-1 & !end_flag_7)
@@ -1866,34 +1924,43 @@ always@(posedge clk)
      end	 
  
  end
- 
- 
-
-always@(posedge clk)
+ */
+ always@(posedge clk)       //to start second iteration
  begin
-  if(!final_reg & count & flag_7 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_10 & wr_addr_9>=`N-1)
+  if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
     begin
-	  op_counter_7<=op_counter_7+1;
-	  check_op_4<=1;
-	   if(op_counter_7==`N-1)
-	      begin
-		   end_flag_10<=1;		 
-		  end
-	end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
+	 count<=1;
+	 iter_num<=iter_num+1;;
+	 //sol_reg<=0;
+	end 
+  else if(!final_flag & count_check==`N)	
      begin
-        op_counter_7<=0; 
-		end_flag_10<=0;
-		check_op_4<=0;
-     end
-   else if(!final_flag & count_check==`N-1)	
-     begin
-     op_counter_7<=0;
-     end_flag_10<=0;
-	 check_op_4<=0;
+       iter_num<=iter_num+1;
      end	 
- 
  end
+  
+
+
+ always@(posedge clk)          /// subtract block ---2  for b-ax
+  begin
+    if(!final_reg & count & check_flag & o_valid_mat_mult )
+	 begin
+	   i_data_1_sub_2<=mem_b[check_reg]; 
+		i_data_2_sub_2<=o_data_mat_mult;
+		//addrb_b<=check_reg;
+		//check_reg<=check_reg+1;
+	   i_valid_1_sub_2<=1'b1;
+	   i_valid_2_sub_2<=1'b1;
+	   i_ready_sub_result_2<=1'b1;
+	 end
+	 else 
+	  begin
+	     i_valid_1_sub_2<=1'b0;
+	     i_valid_2_sub_2<=1'b0;
+	  end
+   end
+ 
+ 
  
  always@(posedge clk)          
   begin
@@ -1901,34 +1968,27 @@ always@(posedge clk)
 	 begin
 	  check_reg<=check_reg +1; 
 	 end
-    else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg)
+    else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg)
      begin
 	  check_reg<=0;
 	 end
-    else if(!final_flag & count_check==`N-1)
+    else if(!final_flag & count_check==`N)
 	 begin
 	   check_reg<=0;
 	 end
    end
  
-always@(posedge clk)
- begin
-  if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
-    begin
-	 count<=1;
-	 //sol_reg<=0;
-	end 
- end
-  
+
  
- always@(posedge clk)
+ always@(posedge clk)                 //for ending the loop
  begin
-  if(final_flag & count_check>=`N-1)
+  if(!final_reg & final_flag & count_check==`N)
     begin
 	 sol<=mem_x[sol_reg];
 	 //addrb_x<=sol_reg;
 	 sol_reg<=sol_reg+1;
-	  if(sol_reg==`N)
+	 o_valid<=1;
+	  if(sol_reg==`N-1)
 	   begin
 	    final_reg<=1;
 	   end
@@ -1936,30 +1996,30 @@ always@(posedge clk)
  else 
    begin
     //count<=1;
-	 sol_reg<=0;
+	 //sol_reg<=0;
+	 o_valid<=0;
    end
  end 
  
- always@(posedge clk)                   // b-ax
+ always@(posedge clk)                   // checking for b-ax at the end of each loop
  begin
   if(!final_reg & count & o_valid_sub_result_2)
    begin
-     if(o_data_sub_result_2 < epsilon)
+     if(o_data_sub_result_2[30:0] < epsilon[30:0])
       begin
 	    final_check<=1;
-        final_flag<=final_flag & final_check;
-		count_check<=count_check+1;
       end
 	 else
        begin
         final_check<=0;
+	   end	
         final_flag<=final_flag & final_check;		
-        count_check<=count_check+1;
-	  end	
+        count_check<=count_check+1;	
    end
- else if(!final_flag & count_check >=`N-1)
+ else if(!final_flag & count_check ==`N)
    begin
      final_flag<=1;
+	 final_check<=1;
 	 count_check<=0;
    
    end
@@ -2195,7 +2255,7 @@ blk_ram blk_ram_b(
 
 
 
-
+/*
  cg_op op_block_inst_3(
 .clk(clk),
 .i_data_vect_1(i_data_1_vect_3),
@@ -2215,7 +2275,7 @@ blk_ram blk_ram_b(
 
 
 
-
+*/
 
 
  cg_op op_block_inst_4(

@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 `define nx 2
-`define ny 2
+`define ny 4
 `define N `nx*`ny
 `define size $clog2(`N)
 
@@ -14,7 +14,13 @@ wire  o_ready;
 wire  o_valid;
 reg [31:0] epsilon;
 
-reg [`size-1:0] count 
+reg [`size-1:0] count;
+
+initial
+ begin
+  count<=0;
+ end
+ 
 initial
 begin
   clk = 1'b0;
@@ -28,9 +34,10 @@ end
 initial
 begin
 @(posedge clk)
+epsilon<=32'h3a83126f;  //t=10e(-3)
 b<=32'h3f800000;   //1
 i_valid<=1'b1;
-epsilon<=32'h3a83126f;  //t=10e(-3)
+
 #10
 @(posedge clk);
 b<=32'h40000000;   //2
@@ -44,6 +51,26 @@ i_valid<=1'b1;
 b<=32'h40800000;  //4
 i_valid<=1'b1;
 #10
+
+@(posedge clk)
+b<=32'h3f800000;   //5
+i_valid<=1'b1;
+
+#10
+@(posedge clk);
+b<=32'h40000000;   //6
+i_valid<=1'b1;
+#10
+@(posedge clk);
+b<=32'h40400000;  //7
+i_valid<=1'b1;
+#10
+@(posedge clk);
+b<=32'h40800000;  //8
+i_valid<=1'b1;
+
+#10
+
 @(posedge clk);
 i_valid<=1'b0;   
 end

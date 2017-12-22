@@ -1,7 +1,8 @@
-`timescale 1ns / 1ps
-`define nx 2
-`define ny 2
-`define N `nx*`ny
+//`timescale 1ns / 1ps
+//`define nx 2
+//`define ny 4
+//`define N `nx*`ny
+`include "../../../include_file.v"
 module cg_scalar_division(
 input wire clk,
 input wire [31:0] i_data_1,
