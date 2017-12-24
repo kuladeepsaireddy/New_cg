@@ -1,7 +1,7 @@
 // Copyright 1986-2015 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2015.4 (win64) Build 1412921 Wed Nov 18 09:43:45 MST 2015
-// Date        : Thu Aug 31 20:29:00 2017
+// Date        : Sat Dec 23 04:01:43 2017
 // Host        : Sai-PC running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode synth_stub
 //               D:/mygit/new_CG_bkup/new_cg/new_cg.srcs/sources_1/ip/scalar_float_division/scalar_float_division_stub.v

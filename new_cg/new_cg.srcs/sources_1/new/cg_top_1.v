@@ -9,6 +9,7 @@ output reg [31:0] sol,
 output reg  o_ready,
 output reg o_valid,
 output reg [`size-1:0]  iter_num,
+input [`size-1:0] req_iter,
 input wire [31:0] epsilon
  );
 //reg [31:0] r;
@@ -246,7 +247,7 @@ wire o_valid_result_reci;
 reg i_ready_result_reci;
 wire [31:0]o_data_result_reci;
 
-	
+	/*
 reg i_valid_1_sub_2;
 wire o_ready_1_sub_2;
 reg[31:0] i_data_1_sub_2;
@@ -256,7 +257,7 @@ reg [31:0] i_data_2_sub_2;
 wire o_valid_sub_result_2;
 reg i_ready_sub_result_2;
 wire [31:0] o_data_sub_result_2;
-
+*/
 
 reg [`size:0] wr_addr;
 reg [`size:0] wr_addr_2;
@@ -269,7 +270,7 @@ reg [`size:0] wr_addr_8;
 reg [`size:0] wr_addr_9;
 reg [`size:0] wr_addr_r;
 reg [`size:0] wr_addr_x;
-reg [`size:0] wr_addr_ax;
+//reg [`size:0] wr_addr_ax;
 reg [`size:0] wr_addr_q;
 
 reg [`size:0] wr_addr_b;
@@ -292,11 +293,11 @@ reg flag_z;
 
 
 reg final_flag;
-reg final_check;
-reg check_flag;
-reg [`size-1:0]check_reg;
+//reg final_check;
+//reg check_flag;
+//reg [`size-1:0]check_reg;
 reg [`size-1:0]sol_reg;
-reg [`size:0] count_check;
+//reg [`size:0] count_check;
 
 
 reg end_flag_1;
@@ -326,7 +327,7 @@ begin
 	 wr_addr_9<=0;
 	 wr_addr_r<=0;
 	 wr_addr_x<=0;
-	 wr_addr_ax<=0;
+	 //wr_addr_ax<=0;
 	 wr_addr_q<=0;
 	 wr_addr_b<=0;
 	 op_counter<=0;
@@ -351,11 +352,11 @@ begin
 	 flag_y<=0;
 	 flag_z<=0;
 	 count<=0;
-	 final_flag<=1;
-	 final_check<=1;
-	 check_flag<=0;
-	 check_reg<=0;
-	 count_check<=0; 
+	 final_flag<=0;
+	 //final_check<=1;
+	 //check_flag<=0;
+	 //check_reg<=0;
+	 //count_check<=0; 
 	 sol_reg<=0;
 	 end_flag_1<=0;
 	 end_flag_2<=0;
@@ -373,10 +374,9 @@ begin
 	 i_valid_2_div_1<=1'b0;
 	 i_valid_1_div_2<=1'b0;
 	 i_valid_2_div_2<=1'b0;
-	 i_valid_1_sub_1<=1'b1;
-	 i_valid_2_sub_1<=1'b1;
-	 i_valid_1_sub_2<=1'b0;
-	 i_valid_2_sub_2<=1'b0;
+	 
+	 //i_valid_1_sub_2<=1'b0;
+	// i_valid_2_sub_2<=1'b0;
 	 i_data_1_valid_1<=1'b0;
 	 i_data_2_valid_1<=1'b0;
 	 i_data_scalar_valid_1<=1'b0;
@@ -391,12 +391,12 @@ begin
 	 i_data_scalar_valid_4<=1'b0;
 	 i_valid_1_sub_1<=1'b0;
 	 i_valid_2_sub_1<=1'b0;
-	 i_valid_1_sub_2<=1'b0;
-	 i_valid_2_sub_2<=1'b0; 
+	 //i_valid_1_sub_2<=1'b0;
+	 //i_valid_2_sub_2<=1'b0; 
      i_data_1_sub_1<=0;	 
 	 i_data_2_sub_1<=0;
-	 i_data_1_sub_2<=0;
-	 i_data_2_sub_2<=0;
+	// i_data_1_sub_2<=0;
+	// i_data_2_sub_2<=0;
 end
 always@(posedge clk)
 begin
@@ -405,13 +405,10 @@ end
 
 
 reg [31:0] mem_r [`N-1:0];
-//reg [31:0] mem_u [`N-1:0];
 reg [31:0] mem_w [`N-1:0];
-//reg [31:0] mem_m [`N-1:0];
 reg [31:0] mem_n [`N-1:0];
 reg [31:0] mem_z [`N-1:0];
 reg [31:0] mem_q [`N-1:0];
-//reg [31:0] mem_s [`N-1:0];
 reg [31:0] mem_p [`N-1:0];
 reg [31:0] mem_x [`N-1:0];
 reg [31:0] mem_b [`N-1:0];
@@ -419,34 +416,7 @@ reg [31:0] mem_b [`N-1:0];
 
 
 
-/*
-always@(posedge clk)
- begin
-   if(i_valid)
-     begin
-	  r<=b;
-	 wea_r<=1;
-	 wea_b<=1;
-	 addra_r<= wr_addr;
-	 addra_b<=wr_addr;
-	 u<=r;
-	 wea_u<=1;
-	 addra_u<=wr_addr;
-	 p<=u;
-	 wea_p<=1'b1;
-	 addra_p<=wr_addr;
-     
-	 wr_addr<=wr_addr+1;
-	 //i_ready_mat_mult<=1'b1;
-	 end
-	 
-	else
-	  begin
-        i_valid_mat_mult<=1'b0;
-      end  
- end  
 
- */
 always@(posedge clk)
  begin
   if(i_valid)
@@ -457,7 +427,7 @@ always@(posedge clk)
    begin
     wr_addr<=0;
    end
- else if(!final_flag & count_check==`N)
+ else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
   begin 
    wr_addr<=0;
   end  
@@ -470,7 +440,7 @@ always@(posedge clk)
    begin
    wr_addr_6<=0;
    end
-  else if(!final_flag & count_check==`N)
+  else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
    begin
     wr_addr_6<=0;
    end
@@ -490,33 +460,12 @@ always@(posedge clk)
    begin
      wr_addr_r<=0;
    end
-  else if(!final_flag & count_check==`N)
+  else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
    begin
       wr_addr_r<=0;
    end   
  end 
-/*
-always@(posedge clk)
- begin
-  
-   if(o_valid_3 &  !final_reg & count & end_flag_6 & check_op_3)
-   begin
-    wr_addr_7<=wr_addr_7+1;
-   end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
-   begin
-      wr_addr_7<=0;
-   end
-   else if(!final_flag & count_check==`N-1 )
-   begin
-      wr_addr_7<=0;
-   end
-  else if(o_valid_3 &  !final_reg & !count)
-    begin
-	 wr_addr_7<=wr_addr_7+1;
-	end    
- end 
- */
+
 
 
 always@(posedge clk)
@@ -525,7 +474,7 @@ always@(posedge clk)
    begin
       wr_addr_5<=0;
    end
-  else if(!final_flag & count_check==`N )
+  else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N )
    begin
       wr_addr_5<=0;
    end 
@@ -552,7 +501,7 @@ always@(posedge clk)
    begin
       wr_addr_2<=0;
    end
-   else if(!final_flag & count_check==`N)
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
    begin
       wr_addr_2<=0;
    end     
@@ -570,7 +519,7 @@ always@(posedge clk)
    begin
       wr_addr_8<=0;
    end
-   else if(!final_flag & count_check==`N )
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
    begin
       wr_addr_8<=0;
    end
@@ -580,23 +529,7 @@ always@(posedge clk)
 	end    
  end  
  
- /*
- always@(posedge clk)
- begin
-   if(o_valid_2 & !final_reg & count & !end_flag_4 & !check_op_2)
-    begin
-	 wr_addr_s<=wr_addr_s+1;
-	end 
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
-   begin
-      wr_addr_s<=0;
-   end
-   else if(!final_flag & count_check==`N-1 )
-   begin
-      wr_addr_s<=0;
-   end     
- end  
- */
+
  
  
   always@(posedge clk)
@@ -609,7 +542,7 @@ always@(posedge clk)
    begin
       wr_addr_q<=0;
    end
-   else if(!final_flag & count_check==`N )
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N )
    begin
       wr_addr_q<=0;
    end     
@@ -630,7 +563,7 @@ always@(posedge clk)
    begin
       wr_addr_4<=0;
    end
-   else if(!final_flag & count_check==`N )
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N )
    begin
       wr_addr_4<=0;
    end     
@@ -647,7 +580,7 @@ always@(posedge clk)
    begin
       wr_addr_9<=0;
    end
-   else if(!final_flag & count_check==`N )
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N )
    begin
       wr_addr_9<=0;
    end     
@@ -661,25 +594,25 @@ always@(posedge clk)
     begin
 	 wr_addr_x<=wr_addr_x+1;
 	end 
-   else if(!final_flag & count_check==`N )
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
    begin
       wr_addr_x<=0;
    end     
  end  
  
- 
+ /*
   always@(posedge clk)
   begin
     if(!final_reg & count & wr_addr_ax<`N & wr_addr_x==`N)
 	 begin
 	  wr_addr_ax<=wr_addr_ax+1;	  
 	 end
-  else if(!final_flag & count_check==`N )
+  else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N )
     begin
       wr_addr_ax<=0;
     end      
   end
- 
+ */
  
  
  always@(posedge clk)
@@ -696,7 +629,7 @@ always@(posedge clk)
    begin
       wr_addr_3<=0;
    end
-   else if(!final_flag & count_check==`N )
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
    begin
       wr_addr_3<=0;
    end     
@@ -743,27 +676,7 @@ always@(posedge clk)    /// r block
  end 
 
  
-/* 
-always@(posedge clk)    /// u block
- begin
-   if(i_valid)
-    begin
-	 mem_u[wr_addr]<=b;
-	end
-  else if(o_valid_3 &  !final_reg & !count )
-   begin
-      mem_u[wr_addr_7]<=o_data_3;
-	  //wr_addr_7<=wr_addr_7+1;
-      
-   end
-  else if(o_valid_3 &  !final_reg & count & end_flag_6 & check_op_3 )
-    begin
-      mem_u[wr_addr_7]<=o_data_3;
-	  //wr_addr_7<=wr_addr_7+1;
-    end		
- end 
- 
- */
+
   
 always@(posedge clk)    /// p block
  begin
@@ -808,51 +721,8 @@ always@(posedge clk)    /// w block
  
  
  
- /* 
-always@(posedge clk)    /// m block
- begin
-   if(!final_reg & !count & o_valid_mat_mult & !flag_3)     //w=A*u
-    begin
-	 mem_m[wr_addr_2]<=o_data_mat_mult;	   
-	   //wea_m<=1'b1;
-	   //addra_m<=wr_addr_2;
-	end
-  else if(o_valid_4 & !final_reg & !count)
-   begin
-       mem_m[wr_addr_8]<=o_data_4;
-	  //wea_m<=1'b1;     
-	 // addra_m<=wr_addr_8;
-	  //wr_addr_8<=wr_addr_8+1;
-   end
-   else  if(o_valid_4 & !final_reg & count & end_flag_9 & check_op_4)
-  begin
-     mem_m[wr_addr_8]<=o_data_4;
-	  //wea_m<=1'b1;     
-	  //addra_m=wr_addr_8;
-	  //wr_addr_8<=wr_addr_8+1;
-  end  
- end 
  
- */
- /*
- always@(posedge clk)    /// s block
- begin
-   if(!final_reg & !count & o_valid_mat_mult & !flag_3)   //w=A*u
-    begin
-	   mem_s[wr_addr_2]<=o_data_mat_mult;
-	  // wea_s<=1'b1;
-	   //addra_s<=wr_addr_2;
-	end
-  else if(o_valid_2 & !final_reg & count & !end_flag_4 & !check_op_2)
-    begin
-	  mem_s[wr_addr_s]<=o_data_2;
-	  //wea_s<=1'b1;
-	  //addra_s<=wr_addr_s;
-	  //wr_addr_s<=wr_addr_s+1;
-   end 
-  end
  
- */
 always@(posedge clk)    /// q block
  begin
    if(!final_reg & !count & o_valid_mat_mult & !flag_3)   //w=A*u
@@ -965,21 +835,21 @@ always@(posedge clk)    /// x block
 	
 	end
 	
-	else if(!final_reg & count & wr_addr_ax<`N & wr_addr_x==`N & wr_addr_4==`N)  //final check A*x
+	/*else if(!final_reg & count & wr_addr_ax<`N & wr_addr_x==`N & wr_addr_4==`N)  //final check A*x
 	 begin
 	     vect_mat_mult<=mem_x[wr_addr_ax];
 	     i_valid_mat_mult<=1'b1;
 		 i_ready_mat_mult<=1'b1; 
 		 check_flag<=1;
-	 end
+	 end*/
 	else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
       begin
-         check_flag<=0;
+        // check_flag<=0;
 		 flag_3<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
-        check_flag<=0;
+       // check_flag<=0;
 		 flag_3<=0;
       end	  
    else
@@ -990,39 +860,7 @@ always@(posedge clk)    /// x block
   end
  
  
- /*
-always@(posedge clk)
- begin
-   if(!final_reg & !count & o_valid_mat_mult & !flag_3 )
-     begin 
-       w<=o_data_mat_mult;	   ///data coming from matrix multiplier is stored in block ram w and block ram w_L/////
-	   wea_w<=1'b1;
-	   addra_w<=wr_addr_2;    
-	   m<=w;	   
-	   wea_m<=1'b1;
-	   addra_m<=wr_addr_2;
-	   q<=m;
-	   wea_q<=1'b1;
-	   addra_q<=wr_addr_2;
-	   s<=w;
-	   wea_s<=1'b1;
-	   addra_s<=wr_addr_2;
-	   wr_addr_2<=wr_addr_2+1;
-     end
-  else if(!final_reg & !count & wr_addr_2==`N-1 & o_valid_mat_mult & flag_3)
-   begin
-        n<=o_data_mat_mult;
-		z<=n;
-	    wea_n<=1'b1;
-		wea_z<=1'b1;
-	    addra_n<=wr_addr_4;
-		addra_z<=wr_addr_4;
-        wr_addr_4<=wr_addr_4+1;
-   
-   end
- end  
  
- */
  integer i;
  integer j;
   integer k;
@@ -1097,7 +935,7 @@ always@(posedge clk)            ////////for vector multiplication
         flag_1<=0; 
 		flag_2<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      flag_1<=0;
 	 flag_2<=0;
@@ -1138,7 +976,7 @@ always@(posedge clk)            ////////for vector multiplication
          flag_4<=0;
 		 flag_x<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
         flag_4<=0;
 		flag_x<=0;
@@ -1161,7 +999,7 @@ always@(posedge clk)                                                    //asssin
       begin
          flag_5<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
         flag_5<=0;
       end	  
@@ -1197,7 +1035,7 @@ always@(posedge clk)       ///////// division block---1
          flag_d<=0;
 		 flag_d_1<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
         flag_d<=0;
         flag_d_1<=0;		
@@ -1235,7 +1073,7 @@ always@(posedge clk)       ///////// division block---1
          flag_y<=0;
 		 flag_z<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
         flag_y<=0;
 	    flag_z<=0;		
@@ -1269,7 +1107,7 @@ always@(posedge clk)       ///////// division block---1
          flag_6<=0;
 		 flag_7<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
         flag_6<=0;
 		flag_7<=0;
@@ -1288,7 +1126,7 @@ always@(posedge clk)       ///////// division block---1
       begin
         flag_b<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
         flag_b<=0;
       end	  
@@ -1321,7 +1159,7 @@ always@(posedge clk)       ///////// division block---1
 		flag_s_1<=0;
 		flag_s_2<=0;
       end
-    else if(!final_flag & count_check==`N)
+    else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
       begin
 		flag_s_1<=0;
 		flag_s_2<=0;
@@ -1712,7 +1550,7 @@ always@(posedge clk)
         op_counter<=0; 
 		end_flag_1<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      op_counter<=0;
 	 end_flag_1<=0;
@@ -1744,7 +1582,7 @@ always@(posedge clk)
         op_counter_1<=0; 
 		end_flag_3<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      op_counter_1<=0;
 	 end_flag_3<=0;
@@ -1752,40 +1590,7 @@ always@(posedge clk)
      end	 
  end 
  
-/* 
-always@(posedge clk)
- begin
-   if(!final_reg & !count & flag_6 & wr_addr_2 >=`N-1 & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3  & !end_flag_5 )
-	  begin
-	    op_counter_2<=op_counter_2+1;
-		if(op_counter_2==`N-1)
-	      begin
-		   end_flag_5<=1;
-		  end
-	  end
-   else if(!final_reg & count & flag_b & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3 & !end_flag_6)  //p
-	   begin
-         op_counter_2<=op_counter_2+1;
-		 if(op_counter_2==`N-1)
-	      begin
-		   end_flag_6<=1;
-		  end
-	  end
-	else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
-     begin
-        op_counter_2<=0; 
-		end_flag_6<=0;
-		end_flag_5<=0;
-     end
-   else if(!final_flag & count_check==`N-1)	
-     begin
-     op_counter_2<=0;
-     end_flag_6<=0;
-     end_flag_5<=0;
-     end	 
- end 
- 
- */
+
 always@(posedge clk)
  begin
    if(!final_reg & !count & flag_6 & wr_addr_4 >=`N-1 & o_ready_1_4 & o_ready_2_4 & o_ready_scalar_4 & !end_flag_5 )
@@ -1810,7 +1615,7 @@ always@(posedge clk)
 		end_flag_5<=0;
         //end_flag_9<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      op_counter_2<=0;
      end_flag_5<=0;
@@ -1836,7 +1641,7 @@ always@(posedge clk)
 		end_flag_2<=0;
 		check_op_1<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      op_counter_3<=0;
      end_flag_2<=0;
@@ -1862,7 +1667,7 @@ always@(posedge clk)
 		end_flag_4<=0;
 		check_op_2<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      op_counter_4<=0;
 	 end_flag_4<=0;
@@ -1890,7 +1695,7 @@ always@(posedge clk)
 		end_flag_6<=0;
 		check_op_3<=0;
      end
-   else if(!final_flag & count_check==`N)	
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
      op_counter_5<=0;
      end_flag_6<=0;
@@ -1898,33 +1703,7 @@ always@(posedge clk)
      end	 
  
  end
- /*
-always@(posedge clk)
- begin
-  if(!final_reg & count & flag_7 & o_ready_1_3& o_ready_2_3 & o_ready_scalar_3 & wr_addr_q>=`N-1 & !end_flag_7)
-    begin
-	  op_counter_6<=op_counter_6+1;
-	  check_op_3<=1;
-	  if(op_counter_6==`N-1)
-	      begin
-		   end_flag_7<=1;		 
-		  end
-	end
-  else if(wr_addr_5 == `N-1 &  wr_addr_6 == `N-1 &  wr_addr_7 == `N-1  & wr_addr_8 == `N-1 & !count & !final_reg )
-     begin
-        op_counter_6<=0; 
-		 end_flag_7<=0;	
-		 check_op_3<=0;
-     end
-   else if(!final_flag & count_check==`N-1)	
-     begin
-     op_counter_6<=0;
-      end_flag_7<=0;
-	  check_op_3<=0;
-     end	 
- 
- end
- */
+
  always@(posedge clk)       //to start second iteration
  begin
   if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg )
@@ -1933,98 +1712,52 @@ always@(posedge clk)
 	 iter_num<=iter_num+1;;
 	 //sol_reg<=0;
 	end 
-  else if(!final_flag & count_check==`N)	
+  else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)	
      begin
        iter_num<=iter_num+1;
      end	 
  end
-  
+ 
+ 
 
 
- always@(posedge clk)          /// subtract block ---2  for b-ax
-  begin
-    if(!final_reg & count & check_flag & o_valid_mat_mult )
-	 begin
-	   i_data_1_sub_2<=mem_b[check_reg]; 
-		i_data_2_sub_2<=o_data_mat_mult;
-		//addrb_b<=check_reg;
-		//check_reg<=check_reg+1;
-	   i_valid_1_sub_2<=1'b1;
-	   i_valid_2_sub_2<=1'b1;
-	   i_ready_sub_result_2<=1'b1;
-	 end
-	 else 
-	  begin
-	     i_valid_1_sub_2<=1'b0;
-	     i_valid_2_sub_2<=1'b0;
-	  end
-   end
  
- 
- 
- always@(posedge clk)          
-  begin
-    if(!final_reg & count & check_flag & o_valid_mat_mult )
-	 begin
-	  check_reg<=check_reg +1; 
-	 end
-    else if(wr_addr_5 == `N &  wr_addr_6 == `N  & wr_addr_8 == `N & !count & !final_reg)
-     begin
-	  check_reg<=0;
-	 end
-    else if(!final_flag & count_check==`N)
-	 begin
-	   check_reg<=0;
-	 end
-   end
- 
-
- 
- always@(posedge clk)                 //for ending the loop
+ always@(*)                 //for ending the loop
  begin
-  if(!final_reg & final_flag & count_check==`N)
+  if((iter_num == (req_iter+1)) & !final_flag)
     begin
-	 sol<=mem_x[sol_reg];
-	 //addrb_x<=sol_reg;
-	 sol_reg<=sol_reg+1;
-	 o_valid<=1;
-	  if(sol_reg==`N-1)
+	 
+	 final_reg<=1;
+	 
+	end
+ /*else 
+   begin
+    final_reg<=0;
+   end   
+ */
+ end 
+ 
+ always@(posedge clk)
+  begin
+   if(iter_num == req_iter+1 & !final_flag)
+    begin
+	  sol<=mem_x[sol_reg];
+	  sol_reg<=sol_reg+1;
+	   o_valid<=1;
+	 if(sol_reg==`N-1)
 	   begin
-	    final_reg<=1;
+	    final_flag<=1;
 	   end
 	end
- else 
+  else 
    begin
-    //count<=1;
-	 //sol_reg<=0;
 	 o_valid<=0;
    end
+
  end 
  
- always@(posedge clk)                   // checking for b-ax at the end of each loop
- begin
-  if(!final_reg & count & o_valid_sub_result_2)
-   begin
-     if(o_data_sub_result_2[30:0] < epsilon[30:0])
-      begin
-	    final_check<=1;
-      end
-	 else
-       begin
-        final_check<=0;
-	   end	
-        final_flag<=final_flag & final_check;		
-        count_check<=count_check+1;	
-   end
- else if(!final_flag & count_check ==`N)
-   begin
-     final_flag<=1;
-	 final_check<=1;
-	 count_check<=0;
-   
-   end
- end 
-
+ 
+ 
  cg_matrix_mult matrix_mult_inst(
 .clk(clk),
 .vect(vect_mat_mult),
@@ -2038,185 +1771,7 @@ always@(posedge clk)
 
 
 
-/*
-blk_ram blk_ram_r(
-  .clka(clk),    // input wire clka
-  .wea(wea_r),      // input wire [0 : 0] wea
-  .addra(addra_r),  // input wire [9 : 0] addra
-  .dina(r),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_r),  // input wire [9 : 0] addrb
-  .doutb(doutb_r)  // output wire [31 : 0] doutb
-);
 
-
-blk_ram blk_ram_u(
-  .clka(clk),    // input wire clka
-  .wea(wea_u),      // input wire [0 : 0] wea
-  .addra(addra_u),  // input wire [9 : 0] addra
-  .dina(u),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_u),  // input wire [9 : 0] addrb
-  .doutb(doutb_u)  // output wire [31 : 0] doutb
-);
-
-
-blk_ram blk_ram_w(
-  .clka(clk),    // input wire clka
-  .wea(wea_w),      // input wire [0 : 0] wea
-  .addra(addra_w),  // input wire [9 : 0] addra
-  .dina(w),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_w),  // input wire [9 : 0] addrb
-  .doutb(doutb_w)  // output wire [31 : 0] doutb
-);
-
-
-blk_ram blk_ram_m(
-  .clka(clk),    // input wire clka
-  .wea(wea_m),      // input wire [0 : 0] wea
-  .addra(addra_m),  // input wire [9 : 0] addra
-  .dina(m),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_m),  // input wire [9 : 0] addrb
-  .doutb(doutb_m)  // output wire [31 : 0] doutb
-);
-
-
-
-blk_ram blk_ram_n(
-  .clka(clk),    // input wire clka
-  .wea(wea_n),      // input wire [0 : 0] wea
-  .addra(addra_n),  // input wire [9 : 0] addra
-  .dina(n),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_n),  // input wire [9 : 0] addrb
-  .doutb(doutb_n)  // output wire [31 : 0] doutb
-);
-
-
-blk_ram blk_ram_z(
-  .clka(clk),    // input wire clka
-  .wea(wea_z),      // input wire [0 : 0] wea
-  .addra(addra_z),  // input wire [9 : 0] addra
-  .dina(z),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_z),  // input wire [9 : 0] addrb
-  .doutb(doutb_z)  // output wire [31 : 0] doutb
-);
-
-
-blk_ram blk_ram_q(
-  .clka(clk),    // input wire clka
-  .wea(wea_q),      // input wire [0 : 0] wea
-  .addra(addra_q),  // input wire [9 : 0] addra
-  .dina(q),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_q),  // input wire [9 : 0] addrb
-  .doutb(doutb_q)  // output wire [31 : 0] doutb
-);
-
-
-
-
-blk_ram blk_ram_s(
-  .clka(clk),    // input wire clka
-  .wea(wea_s),      // input wire [0 : 0] wea
-  .addra(addra_s),  // input wire [9 : 0] addra
-  .dina(s),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_s),  // input wire [9 : 0] addrb
-  .doutb(doutb_s)  // output wire [31 : 0] doutb
-);
-
-
-
-blk_ram blk_ram_p(
-  .clka(clk),    // input wire clka
-  .wea(wea_p),      // input wire [0 : 0] wea
-  .addra(addra_p),  // input wire [9 : 0] addra
-  .dina(p),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_p),  // input wire [9 : 0] addrb
-  .doutb(doutb_p)  // output wire [31 : 0] doutb
-);
-
-
-
-blk_ram blk_ram_x(
-  .clka(clk),    // input wire clka
-  .wea(wea_x),      // input wire [0 : 0] wea
-  .addra(addra_x),  // input wire [9 : 0] addra
-  .dina(x),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_x),  // input wire [9 : 0] addrb
-  .doutb(doutb_x)  // output wire [31 : 0] doutb
-);
-
-
-
-blk_ram blk_ram_b(
-  .clka(clk),    // input wire clka
-  .wea(wea_b),      // input wire [0 : 0] wea
-  .addra(addra_b),  // input wire [9 : 0] addra
-  .dina(b),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .rstb(rstb),    // input wire rstb
-  .addrb(addrb_b),  // input wire [9 : 0] addrb
-  .doutb(doutb_b)  // output wire [31 : 0] doutb
-);
-
- 
-
- BRAM_r blk_ram_r_L (
-  .clka(clk),    // input wire clka
-  .wea(wea_r),      // input wire [0 : 0] wea
-  .addra(addra_r),  // input wire [9 : 0] addra
-  .dina(r),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .addrb(addrb_r_L),  // input wire [7 : 0] addrb
-  .doutb(doutb_r_L)  // output wire [127 : 0] doutb
-);
- 
- 
-
-
-
-
-  BRAM_r blk_ram_u_L(
-  .clka(clk),    // input wire clka
-  .wea(wea_u),      // input wire [0 : 0] wea
-  .addra(addra_u),  // input wire [9 : 0] addra
-  .dina(u),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .addrb(addrb_u_L),  // input wire [5 : 0] addrb
-  .doutb(doutb_u_L)  // output wire [511 : 0] doutb
-);
-
-
-
-
-
-  BRAM_r blk_ram_w_L(
-  .clka(clk),    // input wire clka
-  .wea(wea_w),      // input wire [0 : 0] wea
-  .addra(addra_w),  // input wire [9 : 0] addra
-  .dina(w),    // input wire [31 : 0] dina
-  .clkb(clk),    // input wire clkb
-  .addrb(addrb_w_L),  // input wire [5 : 0] addrb
-  .doutb(doutb_w_L)  // output wire [511 : 0] doutb
-);
-*/
 
  cg_op op_block_inst_1(
 .clk(clk),
@@ -2255,27 +1810,7 @@ blk_ram blk_ram_b(
 
 
 
-/*
- cg_op op_block_inst_3(
-.clk(clk),
-.i_data_vect_1(i_data_1_vect_3),
-.i_data_vect_2(i_data_2_vect_3),
-.i_data_scalar(i_data_scalar_3),
-.i_data_1_valid(i_data_1_valid_3),
-.i_data_2_valid(i_data_2_valid_3),
-.i_data_scalar_valid(i_data_scalar_valid_3),
-.o_ready_1(o_ready_1_3),
-.o_ready_2(o_ready_2_3),
-.o_ready_scalar(o_ready_scalar_3),
-.o_data(o_data_3),
-.o_valid(o_valid_3),
-.i_ready(i_ready_3)
-    
-);
 
-
-
-*/
 
 
  cg_op op_block_inst_4(
@@ -2341,31 +1876,7 @@ cg_scalar_division div_inst_beta(
 
 
 	
-/*	
-cg_scalar_division div_inst_beta/alpha(
-.clk(clk),
-.i_data_1(o_data_div_2),
-.i_data_2(alpha),
-.i_valid_1(o_valid_result_div_2),
-.i_valid_2(o_valid_result_div_1),
-.o_ready_1(i_ready_result_div_2),
-.o_ready_2(o_ready_2_div_2),
-.o_data(o_data_div_3),
-.o_valid_result(o_valid_result_div_3),
-.i_ready_result(i_ready_result_div_3)
-    );
-cg_scalar_division div_inst_gamma/delta(
-.clk(clk),
-.i_data_1(gamma),
-.i_data_2(delta),
-.i_valid_1(i_valid_1_div_4),
-.i_valid_2(i_valid_2_div_4),
-.o_ready_1(o_ready_1_div_4),
-.o_ready_2(o_ready_2_div_4),
-.o_data(o_data_div_4),
-.o_valid_result(o_valid_result_div_4),
-.i_ready_result(i_ready_result_div_4)
-    );*/
+
 vect_float_sub sub_inst_1(                                         ///to find alpha
   .aclk(clk),                                  // input wire aclk
   .s_axis_a_tvalid(i_valid_1_sub_1),            // input wire s_axis_a_tvalid
@@ -2390,7 +1901,7 @@ reciprocal reci_alpha (
   .m_axis_result_tdata(o_data_result_reci)    // output wire [31 : 0] m_axis_result_tdata
 );
 
-
+/*
 vect_float_sub sub_inst_2(                                         ///to find alpha
   .aclk(clk),                                  // input wire aclk
   .s_axis_a_tvalid(i_valid_1_sub_2),            // input wire s_axis_a_tvalid
@@ -2402,5 +1913,5 @@ vect_float_sub sub_inst_2(                                         ///to find al
   .m_axis_result_tvalid(o_valid_sub_result_2),  // output wire m_axis_result_tvalid
   .m_axis_result_tready(i_ready_sub_result_2),  // input wire m_axis_result_tready
   .m_axis_result_tdata(o_data_sub_result_2)    // output wire [31 : 0] m_axis_result_tdata
-);	
+);*/	
 endmodule
