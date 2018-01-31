@@ -94,106 +94,10 @@ always @(posedge clk)
 reg valid_t_1;
 reg  valid_t_2;
 
-/*  
-always@(clk)
- begin
-  valid_t_1 = valid_1;
-  valid_t_2 = valid_2;
- end
-
-
-always@(posedge clk)
- begin
-  if(valid_t_1)
-   begin
-     valid_m_1<=1;
-   end
- else 
-   begin
-    valid_m_1<=0;
-   end   
- end
  
- 
- always@(posedge clk)
- begin
-  if(valid_t_2)
-   begin
-     valid_m_2<=1;
-   end
- else 
-   begin
-    valid_m_2<=0;
-   end   
- end
-*/ 
-/*
-
-always@(posedge clk)
-begin
- //check_reg<=1'b1;
- for(k=0;k<`N;k=k+1)
-  begin
-    check_reg<=o_ready_1[k] & check_reg;
-  end
-  
-
-  if(check_reg==1)
-   begin
-     main_o_ready_1<=1'b1;
-	   end
-  else
-   begin
-     main_o_ready_1<=1'b0;
-   end   
-end  
-
-always@(posedge clk)
-begin
- for(m=0;m<`N;m=m+1)
-  begin
-    check_reg_1<=o_ready_2[m] & check_reg_1;
-  end
-
-  if(check_reg_1==1)
-   begin
-     main_o_ready_2<=1'b1;
-	   end
-  else
-   begin
-     main_o_ready_2<=1'b0;
-   end     
-end
-*/
 
 
-/*
-always@(posedge clk)
-begin
- for(k=0;k<`N;k=k+1)
-  begin
-   if(o_ready_1[k]!=1'b1)
-    begin
-     test_1<=1'b0;
-    end
-  end
-  if(test_1!=1'b0)
-   main_o_ready_1<=1'b1;
-end
 
-always@(posedge clk)
-begin
- for(k=0;k<`N;k=k+1)
-  begin
-   if(o_ready_1[k]!=1'b1)
-    begin
-     test_2<=1'b0;
-    end
-  end
-  if(test_2!=1'b0)
-   main_o_ready_2<=1'b1;
-end
-  */
 generate
 genvar x, y, z; 
 for (x=0;x<numloop+1;x=x+1) begin:xs
@@ -237,41 +141,6 @@ for (x=0;x<numloop+1;x=x+1) begin:xs
    end
 
    
-  /*
-generate
-genvar x, y, z; 
-for (x=0;x<numloop+1;x=x+1) begin:xs
-  if(x==0)
-   begin: instnce
-   for (y=0; y<`N; y=y+1) begin:ys    
-		     my_mult
-			   my_mult_instance(
-			.i_data_1(i_data_1[y]),
-			.i_data_2(i_data_2[y]),
-			.o_data(o_data[y]) 
-		);
-		  end
-		end
-		
-	
-	else
-     
-     begin: instnce
-      for(z=0;z< `N/(2**(x-1));z=z+2) begin:zs
 
-	   
-	    adder
-		  my_adder_instance(
-		   .i_data_1(o_data[2*`N*(1-((1/2)^^(x-1)))+z]),
-		   .i_data_2(o_data[2*`N*(1-((1/2)^^(x-1)))+z+1]),
-		   .o_data(o_data[2*`N*(1-((1/2)^^x))+z/2])
-		   );
-	   
-	   end
-	end
-   end
-     
-   
-   */
   endgenerate
 endmodule

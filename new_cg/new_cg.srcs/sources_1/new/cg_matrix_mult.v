@@ -13,7 +13,19 @@ input wire i_valid,
 
 output  wire [31:0] o_data,
 output wire o_valid,
-input wire i_ready
+input wire i_ready,
+
+input [31:0] i_vect_left,
+input [31:0] i_vect_right,
+input [31:0] i_vect_top,
+input [31:0] i_vect_bottom,
+
+input i_valid_vect_left,
+input i_valid_vect_right,
+input i_valid_vect_bottom,
+input i_valid_vect_top
+
+
 );
 
 wire end_sig;
@@ -39,7 +51,10 @@ reg start;
 //wire [31:0] doutb;
 
 reg [`n_size:0] wr_addr;
-
+reg [`n_size:0] wr_addr_left;
+reg [`n_size:0]  wr_addr_right;
+reg [`n_size:0]  wr_addr_top;
+reg [`n_size:0] wr_addr_bottom;
 
 reg i_valid_1_add_1;
 wire o_ready_1_add_1;
@@ -84,6 +99,10 @@ begin
  i<=1;
  j<=1;
  wr_addr<=1;
+ wr_addr_left<=1;
+ wr_addr_right<=1;
+ wr_addr_top<=1;
+ wr_addr_bottom<=1;
  //dina<='d1;//
  //addrb<=0;
  //count_reg<=0;
@@ -104,6 +123,10 @@ end
 
 
 reg [31:0] my_mem[`N:1];
+reg [31:0] my_mem_left[`s_y_count:1];
+reg [31:0] my_mem_right[`s_y_count:1];
+reg [31:0] my_mem_top[`s_x_count:1];
+reg [31:0] my_mem_bottom[`s_x_count:1];
 
 always@(posedge clk)
 begin
@@ -111,6 +134,10 @@ begin
 if(end_sig)
  begin
   wr_addr<=1;
+  
+  //wr_addr_right<=1;
+  //wr_addr_top<=1;
+  //wr_addr_bottom<=1;
  end
  
 else if(i_valid)
@@ -126,21 +153,71 @@ else if(i_valid)
 
 end
 
-
-
+always@(posedge clk)
+ begin
+  if(end_sig)
+   begin
+    wr_addr_left<=1; 
+   end
+  else if(i_valid_vect_left)
+   begin
+    my_mem_left[wr_addr_left]<=i_vect_left;
+	 wr_addr_left<=wr_addr_left+1;
+   end
+ 
+ end
+always@(posedge clk)
+ begin
+  if(end_sig)
+   begin
+    wr_addr_right<=1; 
+   end
+  else if(i_valid_vect_right)
+   begin
+    my_mem_right[wr_addr_right]<=i_vect_right;
+	 wr_addr_right<=wr_addr_right+1;
+   end
+ 
+ end
+ always@(posedge clk)
+ begin
+  if(end_sig)
+   begin
+    wr_addr_top<=1; 
+   end
+  else if(i_valid_vect_top)
+   begin
+    my_mem_top[wr_addr_top]<=i_vect_top;
+	 wr_addr_top<=wr_addr_top+1;
+   end
+ 
+ end
+ always@(posedge clk)
+ begin
+  if(end_sig)
+   begin
+    wr_addr_bottom<=1; 
+   end
+  else if(i_valid_vect_bottom)
+   begin
+    my_mem_bottom[wr_addr_bottom]<=i_vect_bottom;
+	 wr_addr_bottom<=wr_addr_bottom+1;
+   end
+ 
+ end
 
 
 
 
 always@(*)
  begin
-  if(i_valid)
-   begin
-    if(wr_addr >`nx +1)
+  //if(i_valid)
+   //begin
+ if(wr_addr ==`N+1 & wr_addr_bottom==`s_x_count+1 &  wr_addr_top==`s_x_count+1 & wr_addr_left==`s_y_count+1 & wr_addr_right==`s_y_count+1 & !end_sig )
     begin
 	 start<=1;
 	end
-   end
+   //end
  else if(end_sig)
   begin
     start<=0;
@@ -178,7 +255,7 @@ begin
 	  end
 	
 	
-   else if(i==1 & j!=1 & j!=`ny)
+   else if(i==1 & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -191,7 +268,7 @@ begin
 	  end
 	  
 	
-   else if(i==1 & j==`ny)
+   else if(i==1 & j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -203,7 +280,7 @@ begin
 		end
 	  end			
 	/////////////
-   else if(i==`nx & j==1)
+   else if(i==`s_x_count & j==1)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -216,7 +293,7 @@ begin
 	  end
 
 	////////////////////////////////////////////////////////////////////////////
-   else if(i==`nx & j!=1 & j!=`ny)
+   else if(i==`s_x_count & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -230,7 +307,7 @@ begin
 	 
 		
 	
-   else if(i==`nx & j==`ny)
+   else if(i==`s_x_count & j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -243,7 +320,7 @@ begin
 	  end
 	 
 	
-   else if(i!=1 & j==1 & i!=`nx)
+   else if(i!=1 & j==1 & i!=`s_x_count)
     begin
 	   if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -259,7 +336,7 @@ begin
 	
 	
 	
-   else if(j==`ny& i!=1 &i!=`nx)
+   else if(j==`ny/2& i!=1 &i!=`s_x_count)
     begin
 	   if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -318,7 +395,7 @@ begin
 	 
 	  end		
 	
-   else if(i==1 & j!=1 & j!=`ny)
+   else if(i==1 & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -334,7 +411,7 @@ begin
 	  
 	 
 	
-   else if(i==1 & j==`ny)
+   else if(i==1 & j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -349,7 +426,7 @@ begin
 	  end	
 	
 	/////////////
-   else if(i==`nx & j==1)
+   else if(i==`s_x_count & j==1)
     begin
 	   if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -365,7 +442,7 @@ begin
 	  
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   else if(i==`nx & j!=1 & j!=`ny)
+   else if(i==`s_x_count & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -381,7 +458,7 @@ begin
 	 
 		
 	
-   else if(i==`nx & j==`ny)
+   else if(i==`s_x_count& j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -397,7 +474,7 @@ begin
 	  
 	
 	
-   else if(i!=1 & j==1 & i!=`nx)
+   else if(i!=1 & j==1 & i!=`s_x_count)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -415,7 +492,7 @@ begin
 	
 	
 	
-   else if(j==`ny& i!=1 &i!=`nx)
+   else if(j==`ny/2& i!=1 &i!=`s_x_count)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -482,7 +559,7 @@ if(end_sig)
 	  end
 	 
 	
-   else if(i==1 & j!=1 & j!=`ny)
+   else if(i==1 & j!=1 & j!=`ny/2)
     begin
 	     if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -499,7 +576,7 @@ if(end_sig)
 	
 	
 	
-   else if(i==1 & j==`ny)
+   else if(i==1 & j==`ny/2)
     begin
 	     if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -514,7 +591,7 @@ if(end_sig)
 	  end
 	
 	/////////////
-   else if(i==`nx & j==1)
+   else if(i==`s_x_count & j==1)
     begin
 	     if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -529,7 +606,7 @@ if(end_sig)
 	  end
 	  	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   else if(i==`nx & j!=1 & j!=`ny)
+   else if(i==`s_x_count & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -545,7 +622,7 @@ if(end_sig)
 	 
 		
 	
-   else if(i==`nx & j==`ny)
+   else if(i==`s_x_count& j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -560,7 +637,7 @@ if(end_sig)
 	  end
 	  
 	
-   else if(i!=1 & j==1 & i!=`nx)
+   else if(i!=1 & j==1 & i!=`s_x_count)
     begin
 	     if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -576,7 +653,7 @@ if(end_sig)
 	  
 
 	
-   else if(j==`ny& i!=1 &i!=`nx)
+   else if(j==`ny/2& i!=1 &i!=`s_x_count)
     begin
 	     if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
@@ -641,10 +718,10 @@ begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
           d0<=my_mem[1];
-          d1<=0;
+          d1<=my_mem_left[j];
 		  d2<=my_mem[2];
-		  d3<=0;
-		  d4<=my_mem[`nx+1];
+		  d3<=my_mem_bottom[i];
+		  d4<=my_mem[`s_x_count+1];
 	     /* i_valid_1_add_1<=1'b1;
 		  i_valid_1_mult<=1'b1;
 		  i_valid_2_add_1<=1'b1;
@@ -667,15 +744,15 @@ begin
 	
 	
 	
-   else if(i==1 & j!=1 & j!=`ny)
+   else if(i==1 & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-          d1<=0;
-	      d2<=my_mem[(j-1)*`nx+i+1];
-          d3<=my_mem[(j-2)*`nx+i];
-		  d4<=my_mem[j*`nx +i];
+          d0<=my_mem[(j-1)*`s_x_count+i];
+          d1<=my_mem_left[j];
+	      d2<=my_mem[(j-1)*`s_x_count+i+1];
+          d3<=my_mem[(j-2)*`s_x_count+i];
+		  d4<=my_mem[j*`s_x_count +i];
           /*i_valid_1_mult<=1'b1;
           i_valid_1_add_1<=1'b1;
           i_valid_2_add_1<=1'b1;
@@ -704,15 +781,15 @@ begin
 	
 	
 	
-   else if(i==1 & j==`ny)
+   else if(i==1 & j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-		  d1<=0;
-		  d2<=my_mem[(j-1)*`nx+i+1];
-		  d3<=my_mem[(j-2)*`nx+i];
-		  d4<=0;
+          d0<=my_mem[(j-1)*`s_x_count+i];
+		  d1<=my_mem_left[j];
+		  d2<=my_mem[(j-1)*`s_x_count+i+1];
+		  d3<=my_mem[(j-2)*`s_x_count+i];
+		  d4<=my_mem_top[i];
          /*  i_valid_1_mult<=1'b1;
           i_valid_1_add_1<=1'b1;	
           i_valid_2_add_1<=1'b1;
@@ -742,15 +819,15 @@ begin
 	
 	
 	/////////////
-   else if(i==`nx & j==1)
+   else if(i==`s_x_count& j==1)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
           d0<=my_mem[i];
 		  d1<=my_mem[i-1];
-		  d2<=0;
-		  d3<=0;
-		  d4<=my_mem[j*`nx +i];
+		  d2<=my_mem_right[j];
+		  d3<=my_mem_bottom[i];
+		  d4<=my_mem[j*`s_x_count +i];
           /*i_valid_1_mult<=1'b1;
           i_valid_1_add_1<=1'b1;	
           i_valid_2_add_1<=1'b1;
@@ -776,15 +853,15 @@ begin
 	
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-   else if(i==`nx & j!=1 & j!=`ny)
+   else if(i==`s_x_count & j!=1 & j!=`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-		  d1<=my_mem[(j-1)*`nx+i-1];
-		  d2<=0;
-		  d3<=my_mem[(j-2)*`nx+i];
-		  d4<=my_mem[j*`nx +i];
+          d0<=my_mem[(j-1)*`s_x_count+i];
+		  d1<=my_mem[(j-1)*`s_x_count+i-1];
+		  d2<=my_mem_right[j];
+		  d3<=my_mem[(j-2)*`s_x_count+i];
+		  d4<=my_mem[j*`s_x_count +i];
 		  j<=j+1;
 		  i<=1;
          /* i_valid_1_mult<=1'b1;
@@ -805,15 +882,15 @@ begin
 	 
 		
 	
-   else if(i==`nx & j==`ny)
+   else if(i==`s_x_count & j==`ny/2)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-		  d1<=my_mem[(j-1)*`nx+i-1];
-		  d2<=0;
-		  d3<=my_mem[(j-2)*`nx+i];
-		  d4<=0;
+          d0<=my_mem[(j-1)*`s_x_count+i];
+		  d1<=my_mem[(j-1)*`s_x_count+i-1];
+		  d2<=my_mem_right[j];
+		  d3<=my_mem[(j-2)*`s_x_count+i];
+		  d4<=my_mem_top[i];
 		  i<=0;
 		  j<=0;
           /*i_valid_1_mult<=1'b1;
@@ -843,15 +920,15 @@ begin
 	
 	
 	
-   else if(i!=1 & j==1 & i!=`nx)
+   else if(i!=1 & j==1 & i!=`s_x_count)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-		  d1<=my_mem[(j-1)*`nx+i-1];
-		  d2<=my_mem[(j-1)*`nx+i+1];
-		  d3<=0;
-		  d4<=my_mem[j*`nx +i];
+          d0<=my_mem[(j-1)*`s_x_count+i];
+		  d1<=my_mem[(j-1)*`s_x_count+i-1];
+		  d2<=my_mem[(j-1)*`s_x_count+i+1];
+		  d3<=my_mem_bottom[i];
+		  d4<=my_mem[j*`s_x_count +i];
 		  i<=i+1;
          /*  i_valid_1_mult<=1'b1;
           i_valid_1_add_1<=1'b1;	
@@ -873,15 +950,15 @@ begin
 	
 	
 	
-   else if(j==`ny& i!=1 &i!=`nx)
+   else if(j==`ny/2& i!=1 &i!=`s_x_count)
     begin
 	    if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-		  d1<=my_mem[(j-1)*`nx+i-1];
-		  d2<=my_mem[(j-1)*`nx+i+1];
-		  d3<=my_mem[(j-2)*`nx+i];
-		  d4<=0;
+          d0<=my_mem[(j-1)*`s_x_count+i];
+		  d1<=my_mem[(j-1)*`s_x_count+i-1];
+		  d2<=my_mem[(j-1)*`s_x_count+i+1];
+		  d3<=my_mem[(j-2)*`s_x_count+i];
+		  d4<=my_mem_top[i];
           i<=i+1;
           /*i_valid_1_mult<=1'b1;
           i_valid_1_add_1<=1'b1;	
@@ -910,11 +987,11 @@ begin
    begin
 	  if(o_ready_1_mult & o_ready_2_add_1 & o_ready_1_add_2 & o_ready_2_add_2)
  		 begin
-          d0<=my_mem[(j-1)*`nx+i];
-		  d1<=my_mem[(j-1)*`nx+i-1];
-		  d2<=my_mem[(j-1)*`nx+i+1];
-		  d3<=my_mem[(j-2)*`nx+i];
-		  d4<=my_mem[j*`nx +i];
+          d0<=my_mem[(j-1)*`s_x_count+i];
+		  d1<=my_mem[(j-1)*`s_x_count+i-1];
+		  d2<=my_mem[(j-1)*`s_x_count+i+1];
+		  d3<=my_mem[(j-2)*`s_x_count+i];
+		  d4<=my_mem[j*`s_x_count +i];
 		  i<=i+1;
           /*i_valid_1_mult<=1'b1;
           i_valid_1_add_1<=1'b1;	
