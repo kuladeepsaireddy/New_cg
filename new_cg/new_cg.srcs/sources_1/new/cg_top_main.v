@@ -1,20 +1,20 @@
 `timescale 1ns / 1ps
 
 `include "../../../include_file.v"
-`define super_scalarity 4
+
 
 module cg_top_main(
 input clk,
 input [31:0] b,
 input i_valid,
-output [31:0] sol,
-output o_valid_main,
+output reg [31:0] sol,
+output reg o_valid_main,
 output [31:0] iter_num,
 input [31:0] req_iter
     );
 
 
-	
+reg [`size:0] count;	
 	
 parameter len= $clog2(`super_scalarity);	
 reg [`i_size:0] send_reg;
@@ -59,13 +59,14 @@ reg top_i_valid[`super_scalarity:1];
 wire [31:0] top_sol[`super_scalarity:1];
 wire top_o_valid[`super_scalarity:1]; 
  
+reg o_ready_sol[`super_scalarity:1]; 
  
 wire o_ready_1[`super_scalarity:1];
 wire o_ready_2[`super_scalarity:1];
 wire o_ready_1_beta[`super_scalarity:1];
 wire o_ready_2_beta[`super_scalarity:1];
 
-
+reg check_flag;
 
 wire [31:0] i_data_mult[`super_scalarity:1];
 wire  i_valid_mult[`super_scalarity:1];
@@ -77,14 +78,23 @@ integer g;
 integer f;
 integer r;
 integer q;
-integer w;
+//integer w;
+integer p;
+integer t;
+//integer e;
+integer v;
+integer j;
 
-reg [31:0]  my_mem [`N:1][`super_scalarity:1];
+reg [31:0]  my_mem [`super_scalarity:1][`N:1];
 reg [31:0] wr_addr[`super_scalarity:1];
 reg [31:0] addr_left[`super_scalarity:1];
 reg [31:0] addr_right[`super_scalarity-1:1];
 reg [31:0] addr_bottom[`super_scalarity: `super_scalarity/2 +1];
 reg [31:0] addr_top[`super_scalarity/2:1];
+reg left_flag;
+reg right_flag;
+reg bottom_flag;
+reg top_flag;
 
 parameter left_len= $clog2(`s_y_count*`super_scalarity);
 parameter top_len= $clog2(`s_x_count*`super_scalarity);
@@ -102,6 +112,9 @@ initial
    send_reg<=0;
    step_count<=1;
    start_mult<=0;
+   o_valid_main<=0;
+   count<=0;
+   sol<=0;
    for(q=1;q<`super_scalarity+1;q=q+1)
      begin
 	  wr_addr[q]<=1;
@@ -109,14 +122,55 @@ initial
 	  addr_right[q]<=1;
 	  addr_bottom[q]<=`N-`s_x_count+1;
 	  addr_top[q]<=1;
+	  //o_ready_sol[q]<=1;
 	 end
 	check_reg<=0; 
 	left_count<=0;
 	right_count<=0;
 	top_count<=0;
 	bottom_count<=0;
-	
+	//addr_count<=1;
+	//s_count<=1;
+	left_flag<=0;
+	right_flag<=0;
+	bottom_flag<=0;
+	top_flag<=0;
  end 
+ 
+ 
+ always@(posedge clk)
+  begin
+   if(iter_num==req_iter+1)
+    begin
+	   o_ready_sol[x_cord]<=1;
+	    for(p=0;p<`super_scalarity+1;p=p+1)
+		 begin
+		  if(p!=x_cord) 
+		    begin
+             o_ready_sol[p]<=0;
+			end 
+         end
+    end	  
+  end
+ 
+ 
+ always@(posedge clk)
+  begin
+    for(t=0;t<`super_scalarity+1;t=t+1)
+	 begin
+	  if(top_o_valid[t])
+	   begin
+        sol<=top_sol[t];
+		o_valid_main<=1;
+		count<=count+1;
+       end	
+	 end
+	if(count==`N_size)
+	 begin
+      o_valid_main<=0;
+     end	 
+  end
+ 
  
  always@(posedge clk)
  begin
@@ -128,54 +182,45 @@ initial
 		  wr_addr[q]<=wr_addr[q]+1;
           check_reg=check_reg+1;
         end 		
-	 end 
+	 end
+if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+     check_reg<=0;
+	 for(v=0;v<`super_scalarity+1;v=v+1)
+	  begin
+       wr_addr[v]<=1;  
+      end	  
+   end
+
  end
- 
+
+
  
 always@(posedge clk)
  begin
-  if(check_reg==`N_size)
-   begin
-     start_mult<=1'b1;
-   end
-  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
    begin
      start_mult<=1'b0;
-	 check_reg<=0;
-   end   
+	 //check_reg<=0;
+
+   end  
+  else if(check_reg==`N_size)
+   begin
+     start_mult<=1'b1;
+   end  
  end 
-/*
-always@(posedge clk)
- begin
-  for(w=1;w<`super_scalarity+1;w=w+1)
-     begin
-	  if(w==`super_scalarity )
-	   begin
-	    if(wr_addr[w]==`N+1 )
-		  begin
-	       check_reg<=check_reg+1;
-          end
-		else
-          begin
-           check_reg<=0;
-          end		  
-	   end
-	  else if(wr_addr[w]==`N+1)
-	   begin
-	     check_reg<=check_reg+1;
-	   end
-        	  
-	 end
-  if(check_reg==`super_scalarity)
-	begin
-	 start_mult<=1;
-	end	
- 
- end 
-*/ 
+
  always@(posedge clk)
   begin
-	if(send_reg==`nx-1 & i_valid)
+    if(send_reg==`nx-1 & iter_num==req_iter+1)
+	 begin
+	  send_reg<=0;
+	 end
+	else if(iter_num==req_iter+1)
+	 begin
+	   send_reg<=send_reg+1;
+	 end 
+	else if(send_reg==`nx-1 & i_valid)
 	 begin
 	  send_reg<=0;
 	 end
@@ -192,7 +237,15 @@ always@(posedge clk)
  
  always@(posedge clk)
   begin
-   if(send_reg==`nx-1 & i_valid)
+   if(send_reg==`nx-1 & iter_num==req_iter+1)
+    begin
+      step_count<='d1;
+    end
+   else if(iter_num==req_iter+1 & send_reg==`s_x_count*step_count-1)
+    begin
+	 step_count<=step_count+1;
+	end
+   else if(send_reg==`nx-1 & i_valid)
     begin
       step_count<='d1;
     end
@@ -210,8 +263,21 @@ always@(posedge clk)
   
 always@(posedge clk)
  begin
- 
-  if(i_valid & send_reg==`s_x_count*step_count-1 & send_reg !=`nx-1)
+  if(iter_num==req_iter+1 &send_reg==`s_x_count*step_count-1 & send_reg !=`nx-1)
+   begin
+    x_cord<=x_cord+1;
+   end
+  else if(iter_num==req_iter+1 & send_reg ==`nx-1 & y_cord >= `ny/2)
+   begin
+     x_cord<= `super_scalarity/2  +1;
+     y_cord <= y_cord+1;
+   end
+   else if(send_reg==`nx-1 & iter_num==req_iter+1)
+    begin
+      x_cord<='d1;
+	  y_cord<=y_cord+1;
+    end
+  else if(i_valid & send_reg==`s_x_count*step_count-1 & send_reg !=`nx-1)
     begin
 	 x_cord<=x_cord+1;
 	end
@@ -241,6 +307,56 @@ always@(posedge clk)															///  matrix multiplication block
 	
   end	
 
+  
+always@(*)
+ begin
+  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+    left_flag<=0;
+   end
+  else if(left_count ==`s_y_count*`super_scalarity)
+   begin
+     left_flag<=1;
+   end
+ end
+ 
+ always@(*)
+ begin
+  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+    right_flag<=0;
+   end
+  else if(right_count ==`s_y_count*`super_scalarity)
+   begin
+     right_flag<=1;
+   end
+ end
+ 
+ 
+always@(*)
+ begin
+  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+    bottom_flag<=0;
+   end
+  else if(bottom_count ==`s_x_count*`super_scalarity)
+   begin
+     bottom_flag<=1;
+   end
+ end
+ 
+ 
+always@(*)
+ begin
+  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+    top_flag<=0;
+   end
+  else if(top_count==`s_x_count*`super_scalarity)
+   begin
+     top_flag<=1;
+   end
+ end 
   
  always@(posedge clk)
  begin
@@ -305,7 +421,17 @@ always@(posedge clk)
 	  
 	end
 	
- else if(start_mult)
+  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+     for(j=1;j<`super_scalarity+1;j=j+1)                           //ending multiplication
+	  begin
+	    addr_left[j]<=`s_x_count;
+		vect_left_i_valid[j]<=1'b0;
+	  end
+	 left_count<=0; 
+   end	
+	
+ else if(start_mult & !left_flag )                                             ///starting multiplication
    begin
      for(h=1;h<`super_scalarity+1;h=h+1)
 	  begin
@@ -313,7 +439,7 @@ always@(posedge clk)
 		 begin
 		   vect_left[h]<=0;
 		   vect_left_i_valid[h]<=1;
-		   left_count=left_count+1;
+		  left_count=left_count+1;
 		 end
 		else if(addr_left[`super_scalarity]<=`N)
           begin
@@ -321,17 +447,12 @@ always@(posedge clk)
 			addr_left[h]<=addr_left[h]+`s_x_count;
 			vect_left_i_valid[h]<=1;
 			left_count=left_count+1;
-          end
-		else
-		  begin
-           for(h=1;h<`super_scalarity+1;h=h+1)
-		     begin
-              vect_left_i_valid[h]<=1'b0;
-		     end
           end		  
 	  end
    end   
   
+ 
+   
  else
        begin
          for(h=1;h<`super_scalarity+1;h=h+1)
@@ -382,7 +503,20 @@ always@(posedge clk)
 	end
    end 
 
-  else if(start_mult)
+   
+  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+      for(g=1;g<`super_scalarity+1;g=g+1)                 ////ending multiplication
+	   begin
+	    addr_right[g]<=1;
+		vect_right_i_valid[g]<=1'b0;
+	   end
+	  right_count<=0; 
+   end   
+   
+   
+   
+  else if(start_mult & !right_flag)                                     //starting multiplication
    begin
     for(g=1;g<`super_scalarity+1;g=g+1)
 	  begin
@@ -398,17 +532,12 @@ always@(posedge clk)
 			addr_right[g]<=addr_right[g]+`s_x_count;
 			vect_right_i_valid[g]<=1;
 			right_count=right_count+1;
-          end
-		 else
-           begin
-             for(g=1;g<`super_scalarity+1;g=g+1)
-		      begin
-	            vect_right_i_valid[g]<=1'b0;
-		      end
-           end		   
+          end		   
 	  end
   
    end
+ 
+  
    
  else 
   begin
@@ -456,8 +585,19 @@ always@(posedge clk)
 		  end 
 		end  
 	end
+	
+ else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+      for(f=1;f<`super_scalarity+1;f=f+1)                                     ///ending multiplication
+	   begin
+	    addr_bottom[f]<=`N-`s_x_count+1;
+		 vect_bottom_i_valid[f]<=1'b0;
+	   end
+      bottom_count<=0;
+   end	
+	
   
-   else if(start_mult)
+   else if(start_mult & !bottom_flag)                                                    //starting multiplication
      for(f=1;f<`super_scalarity+1;f=f+1)
 	  begin
 	    if(f<`super_scalarity/2+1)
@@ -472,15 +612,9 @@ always@(posedge clk)
 			addr_bottom[f]<=addr_bottom[f]+1;
 			vect_bottom_i_valid[f]<=1;
 			bottom_count=bottom_count+1;
-          end
-		 else
-           begin
-             for(f=1;f<`super_scalarity+1;f=f+1)
-		      begin
-	            vect_bottom_i_valid[f]<=1'b0;
-		      end
-           end		   
+          end		   
 	  end
+	  
   
  	
   else 
@@ -529,7 +663,19 @@ always@(posedge clk)
      end	 
    end
    
-  else if(start_mult)
+  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+   begin
+    for(r=1;r<`super_scalarity+1;r=r+1)                      ///ending the multiplication
+	 begin
+	  addr_top[r]<=1;
+	  vect_top_i_valid[r]<=1'b0;
+     end
+	 top_count<=0;
+   end 
+   
+   
+   
+  else if(start_mult & !top_flag)                           //starting multiplication
   begin
      for(r=1;r<`super_scalarity+1;r=r+1)
 	  begin
@@ -546,19 +692,14 @@ always@(posedge clk)
 			vect_top_i_valid[r]<=1;
 			top_count=top_count+1;
           end
-		 else
-           begin
-             for(r=1;r<`super_scalarity+1;r=r+1)
-		      begin
-	            vect_top_i_valid[r]<=1'b0;
-		      end
-           end		   
+				   
 	  end
 
 
   end  
   
-  
+ 
+   
  else
      begin
        for(r=1;r<`super_scalarity+1;r=r+1)
@@ -568,36 +709,9 @@ always@(posedge clk)
      end
  end 
 
-  /*
-  
-always@(posedge clk)
- begin
-  for( k=1;k<`super_scalarity+1;k=k+2)
-   begin
-     if(i_valid_alpha[k] & o_ready_1 [k] & o_ready_2[k])
-	  begin
-	   i_data_1[k]<=alpha_local[k];
-	   valid_m_1[k]<=1;
-	   i_data_2[k+1]<=alpha_local[k+1];
-	   valid_m_2[k+1]<=1;
-	  end
-    else if(i_valid_beta &  o_ready_1 [k] & o_ready_2[k])
-	 begin
-	  i_data_1[k]<=beta_local[k];
-	   valid_m_1[k]<=1;
-	   i_data_2[k+1]<=beta_local[k+1];
-	   valid_m_2[k+1]<=1;
-	 end
-	else 
-     begin
-       valid_m_1[k]<=0;
-	   valid_m_2[k]<=0;
-     end	 
-   end
 
- end 
-
- */
+ 
+ 
 generate                                            //for adding gamma
 genvar x, y, z; 
 for (x=0;x<len;x=x+1) begin:xs
@@ -643,6 +757,8 @@ for (x=0;x<len;x=x+1) begin:xs
  endgenerate
 
 
+assign i_ready[3*`super_scalarity-4] =1;
+assign i_ready_delta[3*`super_scalarity-4]=1;
 
 always@(posedge clk)
   begin 
@@ -650,6 +766,8 @@ always@(posedge clk)
 	o_valid_gamma<= o_valid[3*`super_scalarity-4];
 	delta<= o_data_delta[3*`super_scalarity-4];
 	o_valid_delta_top<= o_valid_delta[3*`super_scalarity-4];
+	//i_ready_delta[3*`super_scalarity-4]<=1;
+	//i_ready[3*`super_scalarity-4]<=1;
   end
 
   
@@ -709,6 +827,7 @@ genvar i;
 		.i_valid(top_i_valid[i]),
 		.sol(top_sol[i]),
 		.o_valid(top_o_valid[i]),
+		.i_ready_sol(o_ready_sol[i]),
 		.iter_num(iter_num),
 		.req_iter(req_iter),
 		

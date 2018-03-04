@@ -5,6 +5,7 @@ input wire clk,
 input wire [31:0] b,
 input wire i_valid,
 output reg [31:0] sol,
+input i_ready_sol,
 output reg o_valid,
 output reg [31:0] iter_num,
 input [31:0]req_iter,
@@ -159,7 +160,7 @@ reg [`n_size:0] wr_addr_9;
 reg [`n_size:0] wr_addr_r;
 reg [`n_size:0] wr_addr_x;
 reg [`n_size:0] wr_addr_q;
-    
+reg [`n_size:0] wr_addr_mult;    
 reg [`n_size:0] wr_addr_b;
 
 reg flag_1;
@@ -177,7 +178,8 @@ reg flag_s_2;
 reg flag_x;
 reg flag_y;
 reg flag_z;
-
+reg flag_gamma;
+reg flag_beta;
 reg final_flag;
 reg [`n_size-1:0]sol_reg;
 
@@ -208,6 +210,7 @@ begin
 	 wr_addr_x<=0;
 	 wr_addr_q<=0;
 	 wr_addr_b<=0;
+	 wr_addr_mult<=0;
 	 op_counter<=0;
 	 op_counter_1<=0;
 	 op_counter_2<=0;
@@ -229,6 +232,8 @@ begin
 	 flag_x<=0;
 	 flag_y<=0;
 	 flag_z<=0;
+	 flag_gamma<=0;
+	 flag_beta<=0;
 	 count<=0;
 	 final_flag<=0;
 	 sol_reg<=0;
@@ -271,7 +276,7 @@ reg [31:0] mem_z [`N-1:0];
 reg [31:0] mem_q [`N-1:0];
 reg [31:0] mem_p [`N-1:0];
 reg [31:0] mem_x [`N-1:0];
-reg [31:0] mem_b [`N-1:0];
+//reg [31:0] mem_b [`N-1:0];
 
 
 always@(posedge clk)
@@ -306,6 +311,20 @@ always@(posedge clk)
      wr_addr_6<=wr_addr_6+1;
    end	   
  end 
+ 
+ /*
+always@(posedge clk)
+ begin
+  if(!final_reg & count & wr_addr_mult<=`N)   //n=A*m
+    begin
+     wr_addr_mult<=wr_addr_mult+1;
+    end	
+  else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
+   begin
+      wr_addr_mult<=0;
+   end   
+ end  
+ */
  
 always@(posedge clk)
  begin
@@ -532,18 +551,30 @@ always@(posedge clk)    /// w block
    if(!final_reg & !count & o_valid_mat_mult & !flag_3 )
      begin 
       mem_w[wr_addr_2]<=o_data_mat_mult;	                              //w=A*u
+	  o_data_mult<=o_data_mat_mult;
+	  o_valid_mult<=1'b1;
 	end
   else if(o_valid_4 & !final_reg & !count)
    begin
       mem_w[wr_addr_8]<=o_data_4;
+	  o_data_mult<=o_data_4;
+	  o_valid_mult<=1'b1;
    end
   else  if(o_valid_4 & !final_reg & count & end_flag_5 & check_op_3)
   begin
      mem_w[wr_addr_8]<=o_data_4;
-  end  
+	 o_data_mult<=o_data_4;
+	  o_valid_mult<=1'b1;
+  end
+  else
+     begin
+       o_valid_mult<=0;
+     end	
  end 
  
- always@(posedge clk)
+ 
+ /*
+ always@(posedge clk)                                                      /////////multiplication block
   begin
     if(!final_reg & !count & o_valid_mat_mult & !flag_3)
      begin
@@ -555,18 +586,24 @@ always@(posedge clk)    /// w block
 	 o_data_mult<=o_data_mat_mult;
 	 o_valid_mult<=1'b1;
 	end
-   else if(!final_reg & count & o_valid_mat_mult& flag_3)   //n=A*m
+   else if(!final_reg & count & wr_addr_mult<`N)   //n=A*m
     begin
-     o_data_mult<=o_data_mat_mult;
+     o_data_mult<=mem_w[wr_addr_mult];
 	 o_valid_mult<=1'b1;
-    end	
+    end
+    else if(o_valid_4 & !final_reg & count & end_flag_5 & check_op_3)
+      begin
+        o_data_mult<=o_data_4;
+        o_valid_mult<=1'b1;
+      end
+	  
    else
      begin
        o_valid_mult<=0;
      end	 
   end
  
- 
+ */
  
  
 always@(posedge clk)    /// q block
@@ -607,14 +644,11 @@ always@(posedge clk)    /// n block
  begin
    if(!final_reg & !count & wr_addr_2==`N & o_valid_mat_mult & flag_3)    //n=A*m
     begin
-	   mem_n[wr_addr_4]<=o_data_mat_mult;
-	  
-	   
+	   mem_n[wr_addr_4]<=o_data_mat_mult;   
 	end
    else if(!final_reg & count & o_valid_mat_mult& flag_3)   //n=A*m
     begin
 	  mem_n[wr_addr_4]<=o_data_mat_mult;
-	   
 	end
  end 
  
@@ -774,14 +808,15 @@ always@(posedge clk)            ////////for vector multiplication
 	   flag_4<=1;
 	   o_valid_gamma_local<=1;
 	  end
-	else if(!final_reg & count & !flag_4 & i_valid_gamma_local)
+	/*else if(!final_reg & count & !flag_4 & i_valid_gamma_local)
      begin
        gamma_old<=gamma;
 	   flag_4<=1;
-     end
-    else if(!final_reg & count & flag_4 & flag_1 & o_valid_result_vect_mult & !flag_x)  ///gamma = r*u
+     end*/
+    else if(!final_reg & count  & flag_1 & o_valid_result_vect_mult & !flag_x)  ///gamma = r*u
      begin
         gamma_local<=o_data_vect_mult;
+		gamma_old<=gamma;
 		flag_x<=1;
 	    o_valid_gamma_local<=1;
      end
@@ -831,12 +866,42 @@ always@(posedge clk)                                                    //asssin
  
  
  
+always@(*)
+ begin
+   if(i_valid_gamma_local)
+    begin
+	 flag_gamma<=1;
+	end
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
+      begin
+         flag_gamma<=0;
+      end
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
+      begin
+        flag_gamma<=0;
+      end	
+ end 
 
-
+ 
+ always@(*)
+ begin
+   if(i_valid_delta_local)
+    begin
+	 flag_beta<=1;
+	end
+  else if(wr_addr_5 == `N &  wr_addr_6 == `N   & wr_addr_8 == `N & !count & !final_reg )
+      begin
+         flag_beta<=0;
+      end
+   else if(!final_reg & count & wr_addr_x==`N & wr_addr_r ==`N &wr_addr_8 ==`N)
+      begin
+        flag_beta<=0;
+      end	
+ end 
  
 always@(posedge clk)       ///////// division block---1
  begin
-  if(!final_reg & !count & flag_4 & flag_5 & o_ready_1_div_1 & o_ready_2_div_1 & !flag_d_1 &i_valid_gamma_local & i_valid_delta_local)
+  if(!final_reg & !count & flag_4 & flag_5 & o_ready_1_div_1 & o_ready_2_div_1 & !flag_d_1 & flag_gamma & flag_beta)
 	  begin
         i_data_1_div_1<=gamma;
 		i_valid_1_div_1<=1'b1;
@@ -845,7 +910,7 @@ always@(posedge clk)       ///////// division block---1
 		 i_ready_result_div_1<=1'b1;
          flag_d_1<=1;		 
       end
- else if(!final_reg & count & flag_x & flag_5 & o_ready_1_div_1 & o_ready_2_div_1  & !flag_d &i_valid_gamma_local & i_valid_delta_local )
+ else if(!final_reg & count & flag_x & flag_5 & o_ready_1_div_1 & o_ready_2_div_1  & !flag_d & flag_gamma & flag_beta )
     begin
         i_data_1_div_1<=delta;
 		i_valid_1_div_1<=1'b1;
@@ -873,7 +938,7 @@ always@(posedge clk)       ///////// division block---1
  
   always@(posedge clk)   ///division block ---2
   begin
-    if(!final_reg & count & flag_4 & flag_x & o_ready_1_div_2 & o_ready_2_div_2 &!flag_y &i_valid_gamma_local )   ///beta= gamma/gamma_old
+    if(!final_reg & count & flag_x & o_ready_1_div_2 & o_ready_2_div_2 &!flag_y &i_valid_gamma_local )   ///beta= gamma/gamma_old
 	  begin 
         i_data_1_div_2<=gamma;
 		i_valid_1_div_2<=1'b1;
@@ -949,7 +1014,7 @@ always@(posedge clk)       ///////// division block---1
 	  beta<=0;
 	  //o_valid_beta<=1;
 	  end
-    else if(!final_reg & count &flag_4 & flag_x & o_valid_result_div_2 & flag_y & !flag_b)
+    else if(!final_reg & count  & flag_x & o_valid_result_div_2 & flag_y & !flag_b)
      begin
 	   beta<=o_data_div_2;
 	   //o_valid_beta<=1;
@@ -1372,7 +1437,7 @@ always@(posedge clk)
  
  always@(*)                 //for ending the loop
  begin
-  if((iter_num == (req_iter+1)) & !final_flag)
+  if((iter_num == (req_iter+1)))
     begin
 	 
 	 final_reg<=1;
@@ -1383,7 +1448,7 @@ always@(posedge clk)
  
  always@(posedge clk)
   begin
-   if(iter_num == req_iter+1 & !final_flag)
+   if(iter_num == req_iter+1 & !final_flag & i_ready_sol)
     begin
 	  sol<=mem_x[sol_reg];
 	  sol_reg<=sol_reg+1;
