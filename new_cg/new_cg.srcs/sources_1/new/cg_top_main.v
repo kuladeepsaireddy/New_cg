@@ -183,7 +183,8 @@ initial
           check_reg=check_reg+1;
         end 		
 	 end
-if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+//if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+  if(left_flag & right_flag & top_flag & bottom_flag) 
    begin
      check_reg<=0;
 	 for(v=0;v<`super_scalarity+1;v=v+1)
@@ -198,7 +199,8 @@ if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_sca
  
 always@(posedge clk)
  begin
-  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+  if(left_flag & right_flag & top_flag & bottom_flag) 
    begin
      start_mult<=1'b0;
 	 //check_reg<=0;
@@ -308,51 +310,55 @@ always@(posedge clk)															///  matrix multiplication block
   end	
 
   
-always@(*)
+always@(posedge clk)
  begin
-  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity )
+  if(left_flag & right_flag & top_flag & bottom_flag) 
    begin
     left_flag<=0;
    end
-  else if(left_count ==`s_y_count*`super_scalarity)
+  else if(left_count ==(`s_y_count-1)*`super_scalarity)
    begin
      left_flag<=1;
    end
  end
  
- always@(*)
+ always@(posedge clk)
  begin
-  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+  if(left_flag & right_flag & top_flag & bottom_flag) 
    begin
     right_flag<=0;
    end
-  else if(right_count ==`s_y_count*`super_scalarity)
+  else if(right_count ==(`s_y_count-1)*`super_scalarity)
    begin
      right_flag<=1;
    end
  end
  
  
-always@(*)
+always@(posedge clk)
  begin
-  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity& bottom_count ==(`s_x_count)*`super_scalarity)
+  if(left_flag & right_flag & top_flag & bottom_flag) 
    begin
     bottom_flag<=0;
    end
-  else if(bottom_count ==`s_x_count*`super_scalarity)
+  else if(bottom_count ==(`s_x_count-1)*`super_scalarity)
    begin
      bottom_flag<=1;
    end
  end
  
  
-always@(*)
+always@(posedge clk)
  begin
-  if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity& bottom_count ==(`s_x_count)*`super_scalarity)
+  if(left_flag & right_flag & top_flag & bottom_flag) 
    begin
     top_flag<=0;
    end
-  else if(top_count==`s_x_count*`super_scalarity)
+  else if(top_count==(`s_x_count-1)*`super_scalarity)
    begin
      top_flag<=1;
    end
@@ -421,7 +427,8 @@ always@(posedge clk)
 	  
 	end
 	
-  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+ // else if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+  else if(left_flag & right_flag & top_flag & bottom_flag)
    begin
      for(j=1;j<`super_scalarity+1;j=j+1)                           //ending multiplication
 	  begin
@@ -504,7 +511,8 @@ always@(posedge clk)
    end 
 
    
-  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //else if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+  else if(left_flag & right_flag & top_flag & bottom_flag)
    begin
       for(g=1;g<`super_scalarity+1;g=g+1)                 ////ending multiplication
 	   begin
@@ -586,7 +594,8 @@ always@(posedge clk)
 		end  
 	end
 	
- else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+ //else if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+   else if(left_flag & right_flag & top_flag & bottom_flag)
    begin
       for(f=1;f<`super_scalarity+1;f=f+1)                                     ///ending multiplication
 	   begin
@@ -663,7 +672,8 @@ always@(posedge clk)
      end	 
    end
    
-  else if(left_count==`s_y_count*`super_scalarity & right_count ==`s_y_count*`super_scalarity & top_count==`s_x_count*`super_scalarity & bottom_count ==`s_x_count*`super_scalarity)
+  //else if(left_count==(`s_y_count)*`super_scalarity & right_count ==(`s_y_count)*`super_scalarity & top_count==(`s_x_count)*`super_scalarity & bottom_count ==(`s_x_count)*`super_scalarity)
+  else if(left_flag & right_flag & top_flag & bottom_flag)
    begin
     for(r=1;r<`super_scalarity+1;r=r+1)                      ///ending the multiplication
 	 begin
@@ -755,7 +765,7 @@ for (x=0;x<len;x=x+1) begin:xs
    end
 
  endgenerate
-
+ 
 
 assign i_ready[3*`super_scalarity-4] =1;
 assign i_ready_delta[3*`super_scalarity-4]=1;
@@ -770,7 +780,7 @@ always@(posedge clk)
 	//i_ready[3*`super_scalarity-4]<=1;
   end
 
-  
+ 
 generate                                               //for adding delta
 genvar a, d, c; 
 for (a=0;a<len;a=a+1) begin:as
